@@ -1,0 +1,189 @@
+/*****************************/
+/*        ESPACE PERSO       */
+/*****************************/
+
+/*menu*/
+#menu{
+
+	width: 80%;
+	height: 40px;
+    margin: auto;
+    background:#1C201F;
+    padding : 0 1%;
+
+}
+
+#menu ul{
+	width: 100%;
+	height: 100%;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    vertical-align: middle;
+	text-align:center;
+}
+
+#menu ul li{
+	cursor: pointer;
+    display: inline-block;
+	font-size:0.9em;
+	color: #FFF;
+    line-height: normal;
+    padding: 1% 4%;
+}
+
+#menu ul li:hover{
+	color: #000;
+    background:#FFF;
+    transition-duration: 0.2s;
+}
+
+/*section*/
+
+
+
+#formulaires{
+    width: 50%;
+    min-width: 360px;
+    background: #FFF;
+    border-radius: 10px;
+    padding: 1%;
+    margin-top: 5%;
+}
+
+
+
+#form_infos_perso h3, #form_infos_perso_modif h3{
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.5em;
+    color: #525252;
+}
+
+#form_infos_perso form, #form_infos_perso_modif form{
+    width: 80%;
+    margin: auto;
+}
+
+#form_infos_perso p{
+	width: 96%;
+    height: 1.5em;
+    line-height: 1.5em;
+    border-bottom: 1px solid #dbdbdb;
+    padding: 1%;
+    border-radius: 5px;
+    margin-top: 1em;
+}
+
+#form_infos_perso_modif input{
+	width: 96%;
+    height: 1.5em;
+    line-height: 1.5em;
+    border: 1px solid #dbdbdb;
+    padding: 1%;
+    border-radius: 5px;
+    margin-top: 1em;
+}
+
+#form_infos_perso_modif .separator{
+	margin-bottom: 15px;
+}
+
+
+
+#form_infos_perso .perso_sub, #form_infos_perso_modif .perso_sub{
+	display: inline-block;
+    font-size: 1em;
+    height: 2em;
+    line-height: 2em;
+    vertical-align: middle;
+    width: 45%;
+}
+
+.bouton {
+	box-shadow:  0px 0px 10px rgba(0, 0, 0, 0.20);
+	margin-left:0%;
+	width: 60%;
+	background-color:#6c0000;
+	text-decoration:none;
+	text-align: center;
+	border:1px solid #666767;
+	cursor:pointer;
+	color:#FFF;
+	font-family:Arial;
+	font-size:1em;
+	padding:0.6em 5em;
+	margin-top: 50px;
+
+	
+	
+}
+.bouton:hover {
+
+	background-color:#A4ACAB;
+	border:1px solid #939A99;
+	
+	
+}
+
+
+
+
+#infodefis
+{
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px solid #ddd;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.barre 
+{
+	display:inline-block;
+	vertical-align:top;
+	width: 20%;
+	background: grey;
+	border: 2px solid grey;
+	position: absolute;
+	height: 20px;
+	left: 400px;
+	border-radius:100px;
+}
+
+.barre:after 
+{
+	content: "";
+	position: absolute;
+	background: #6c0000;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	border-radius:100px;
+	
+}
+
+.barre[data-length="60"]:after 
+{ 
+	width: 60% 
+}
+
+#nomdef{
+	display:inline-block;
+	vertical-align:top;
+	width:5%;
+}
+
+
+#nbpointdef{
+	display:inline-block;
+	vertical-align:top;
+	padding-left: 50%;
+	width:5%;
+}
+
+#statut{
+	padding-left: 75%;
+	vertical-align:top;
+
+}

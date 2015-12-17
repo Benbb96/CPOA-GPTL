@@ -1,0 +1,69 @@
+/*****************************/
+/*         HEADER            */
+/*****************************/
+header{
+    width: 85%;
+    min-width: 560px;
+	margin : 8px
+}
+
+header h1{
+    font-family: 'J.M.Nexus-Black';
+    font-size: 6em;
+    font-weight: normal;
+    color: black; 
+	text-shadow : -1px 0 #DCE3E2, 0 1px #DCE3E2, 1px 0 #DCE3E2, 0 -1px #DCE3E2
+;
+}
+
+/*****************************/
+/*       FORMULAIRE          */
+/*****************************/
+#formulaires{
+    width: 30%;
+    min-width: 360px;
+    background: #FFF;
+    border-radius: 10px;
+    padding: 1%;
+}
+
+#form_connexion h3, #form_inscription h3{
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.5em;
+    color: #BEBEBE
+;
+}
+
+#form_connexion form, #form_inscription form{
+    width: 90%;
+    margin: auto;
+}
+
+#form_connexion input, #form_inscription input{
+	width: 96%;
+    height: 1.5em;
+    line-height: 1.5em;
+    border: 1px solid #dbdbdb;
+    padding: 1%;
+    border-radius: 5px;
+    margin-top: 1em;
+}
+
+#form_inscription .separator{
+	margin-bottom: 15px;
+}
+
+#form_connexion .index_button_container, #form_inscription .index_button_container{
+    width: 100%;
+    margin-top: 20px;
+}
+
+#form_connexion .index_sub, #form_inscription .index_sub{
+	display: inline-block;
+    font-size: 1em;
+    height: 2em;
+    line-height: 2em;
+    vertical-align: middle;
+    width: 45%;
+}

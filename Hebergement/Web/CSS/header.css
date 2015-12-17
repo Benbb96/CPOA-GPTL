@@ -1,0 +1,85 @@
+/*****************************/
+/*         HEADER            */
+/*****************************/
+header{
+    width: 100%;
+    min-width: 560px;
+    margin-bottom: 20px;
+    background: #E6E6E6;
+}
+
+header #top{
+    width: 90%;
+    margin: 0 5%;
+}
+
+header #top #left, header #top #right{
+    width: 50%;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+header #top #right{
+    text-align: right;
+}
+
+header #top #left h1{
+    display: inline-block;
+    font-family: "J.M.Nexus-Black";
+    font-size: 4em;
+    font-weight: normal;
+    color: #C2501A;
+	text-shadow : -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+}
+
+header #top #right span{
+    position: relative;
+    display: inline-block;
+    text-align: right;
+}
+header #top #right span a{
+    text-decoration: underline;
+    color: #C54600;
+    font-size: 0.8em;
+}
+
+header nav{
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    background: #C54600;
+    color: #FFF;
+}
+
+header nav ul{
+    margin: 0;
+    padding: 0;
+    text-align: right;
+    margin-right: 5%;
+}
+
+header nav a{
+    color: #FFF;
+    text-decoration: none;
+    height: 50px;
+}
+
+header nav a:hover{
+    background: #000;
+}
+
+header nav li{
+    display: inline-block;
+    padding: 0 2%;
+    cursor: pointer;
+}
+
+header nav li:hover{
+    background: #ededed;
+    color: #C54600;
+}
+
+header nav ul .active{
+    background: #FFF;
+    color: #C54600;
+}

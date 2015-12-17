@@ -1,0 +1,156 @@
+@font-face {
+    font-family: "J.M.Nexus-Black";
+    src: url("../FONT/J.M.Nexus-Black.ttf");
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    background: url('../IMG/tennis.jpg') no-repeat center fixed;
+    background-size: cover;
+    background-color: #dbdbdb;
+    font-family: Verdana;
+    color: #000;
+    font-size: 1em;
+}
+
+p, h1, h2, h3, h4, h5, h6{
+    margin: 0;
+    padding: 0;
+}
+
+a{
+    text-decoration: none;
+    color: #000;
+}
+
+hr{
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    border-style: none;
+    border-bottom: 1px solid #888888;
+}
+
+input{
+    color: #939393;
+    background: #efefef;
+}
+
+input:focus{
+    outline: none;
+    border-color: #101010;
+    box-shadow: 0 0 2px #101010;
+}
+
+/*****************************/
+/*         TEMPLATE          */
+/*****************************/
+#container{
+    width: 80%;
+    margin: auto;
+    background: #FFF;
+    padding: 1%;
+    border-radius: 5px;
+}
+
+.center{
+    margin: auto;
+}
+
+/* Button 1 */
+.button{
+    width: 100%;
+    margin: auto;
+    height: 2em;
+    line-height: 2em;
+    background: #C54600	;
+    color: #FFF;
+    font-size: 1.5em;
+    text-align: center;
+    border: 1px solid #C54600;
+    cursor: pointer;
+    
+    transition-property: color, background;
+    transition-duration: 0.2s;
+}
+
+.button:hover{
+    background: #FFF;
+    color: #C54600;
+}
+
+.button a:hover{
+    color: #C54600;
+}
+
+/* Button 2 */
+.inv_button{
+    width: 100%;
+    margin: auto;
+    height: 2em;
+    line-height: 2em;
+    background: #FFF;
+    color: #C54600;
+    font-size: 1.5em;
+    text-align: center;
+    border: 1px solid #C54600;
+    cursor: pointer;
+    
+    transition-property: color, background;
+    transition-duration: 0.2s;
+}
+
+.inv_button:hover {
+	background: #C54600;
+    color: #FFF;
+}
+
+.inv_button a:hover{
+    color: #FFF;
+}
+
+/* Button 3 */
+.transparent_button{
+    width: 100%;
+    margin: auto;
+    height: 2em;
+    line-height: 2em;
+    background: rgba(0, 0, 0, 0.08);
+    color: #C54600;
+    font-size: 1.5em;
+    text-align: center;
+    border: 1px solid #C54600;
+    border-radius: 5px;
+    cursor: pointer;
+    
+    transition-property: color, background;
+    transition-duration: 0.2s;
+}
+
+.transparent_button:hover{
+    background: #C54600;
+    color: #FFF;
+    border: 1px solid #C54600;
+}
+
+.transparent_button a:hover{
+    color: #FFF;
+    border: 1px solid #C54600;
+}
+
+.button a, .inv_button a, .transparent_button a{
+    color: #FFF;
+    display: block;
+}
+
+.tb_active{
+    background: #C54600;
+    color: #FFF;
+    border: 1px solid #C54600; 
+}
+#ucbl
+{
+position: fixed;
+bottom: 0;
+right: 0; 
+}

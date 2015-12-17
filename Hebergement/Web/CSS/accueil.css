@@ -1,0 +1,47 @@
+/*****************************/
+/*         ACCUEIL           */
+/*****************************/
+
+#filterNews{ 
+	width: 70%;
+    margin: 20px auto;
+}
+
+#filterNews div{
+	display:inline-block;
+    width:20%;
+    font-size:1em;
+    margin:0 2%;
+}
+
+#ensembleNews{
+	width: 90%;
+    margin: auto;
+}
+
+.blocNews{
+    width:100%;
+    background: #FFFFFF;
+    margin-bottom: 30px;
+    border: 1px solid #C2501A;
+}
+
+.blocNews h1{
+    background: #C2501A;
+    text-transform: uppercase;
+    color: white;
+    font-size: 0.9em;
+    font-weight: normal;
+    padding: 2%;
+}
+
+.blocNews h1 span{
+    float: right;
+    color: #C2501A;
+    font-size: 0.8em;
+	text-align: right;
+}
+
+.blocNews p{
+    padding: 2%;
+}
