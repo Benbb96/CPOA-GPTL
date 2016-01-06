@@ -6,13 +6,10 @@
 package metiers;
 
 import connexion.ConfigConnexion;
-import static connexion.ConfigConnexion.getConnection;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,12 +76,13 @@ public class MatchSimple extends Match {
     /**
      * Obtenir un match en fonction de son id
      * @param idMatch
+     * @param conn Une connexion à la base
      * @return le match correspond à l'id passé en paramètre
      */
-    public static MatchSimple getMatch(int idMatch) {
+    public static MatchSimple getMatch(int idMatch, Connection conn) {
         MatchSimple match = null;
         try {
-            ResultSet rset = ConfigConnexion.executeRequete("select date_match, heure_match, idj1, idj2 from Match_Simple where idMatch="+idMatch);
+            ResultSet rset = ConfigConnexion.executeRequete(conn,"select date_match, heure_match, idj1, idj2 from Match_Simple where idMatch="+idMatch);
             if(rset.next()) {
                 match = new MatchSimple(idMatch, rset.getString(1).substring(0, 10), rset.getInt(2), rset.getInt(3), rset.getInt(4));
             }
@@ -94,10 +92,10 @@ public class MatchSimple extends Match {
         return match;
     }
     
-    public static MatchSimple getMatch(String date, int heure) {
+    public static MatchSimple getMatch(String date, int heure, Connection conn) {
         MatchSimple match = null;
         try {
-            ResultSet rset = ConfigConnexion.executeRequete("select id_match, idj1, idj2 from Match_Simple where date_match="+date+" and heure_match="+heure);
+            ResultSet rset = ConfigConnexion.executeRequete(conn, "select id_match, idj1, idj2 from Match_Simple where date_match="+date+" and heure_match="+heure);
             match = new MatchSimple(rset.getInt(1), date, heure, rset.getInt(2), rset.getInt(3));
         } catch (SQLException ex) {
             Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
@@ -105,22 +103,18 @@ public class MatchSimple extends Match {
         return match;
     }
     
-    public void ajouterMatchSimple() {
+    public void ajouterMatchSimple(Connection conn) {
         try {
             String requete = "Insert into Match_Simple(idMatch, idj1, idj2, date_match, heure_match) Values (?,?,?,?,?)";
-            try (Connection conn = getConnection ("connexion.properties")) {
-                PreparedStatement prepared = conn.prepareStatement(requete);
-                prepared.setInt(1,this.getIdMatch());
-                prepared.setInt(2,this.getJ1().getIdJoueur());
-                prepared.setInt(3,this.getJ2().getIdJoueur());
-                prepared.setString(4,this.getDate());
-                prepared.setInt(5,this.getHeure());
-                //int result = prepared.executeUpdate("Insert into Match_Simple(idMatch, idj1, idj2, date_match, heure_match) Values ("+this.getIdMatch()+", "+this.getJ1().getIdJoueur()+", "+this.getJ2().getIdJoueur()+", '"+this.getDate()+"', "+this.getHeure()+");");
-                int result = prepared.executeUpdate();
-                System.out.println(result + " ligne(s) insérée(s)");
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
+            PreparedStatement prepared = conn.prepareStatement(requete);
+            prepared.setInt(1,this.getIdMatch());
+            prepared.setInt(2,this.getJ1().getIdJoueur());
+            prepared.setInt(3,this.getJ2().getIdJoueur());
+            prepared.setString(4,this.getDate());
+            prepared.setInt(5,this.getHeure());
+            //int result = prepared.executeUpdate("Insert into Match_Simple(idMatch, idj1, idj2, date_match, heure_match) Values ("+this.getIdMatch()+", "+this.getJ1().getIdJoueur()+", "+this.getJ2().getIdJoueur()+", '"+this.getDate()+"', "+this.getHeure()+");");
+            int result = prepared.executeUpdate();
+            System.out.println(result + " ligne(s) insérée(s)");
         } catch (SQLSyntaxErrorException ex) {
             Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -130,10 +124,11 @@ public class MatchSimple extends Match {
     
     /**
      * Remet à jour la map contenant tous les matchs simples indexés par les id
+     * @param conn Une connexion à la base
      */
-    public static void updateListMatchSimple() {
+    public static void updateListMatchSimple(Connection conn) {
         try {
-            ResultSet rset = ConfigConnexion.executeRequete("select idmatch, date_match, heure_match, idj1, idj2 from MATCH_SIMPLE");
+            ResultSet rset = ConfigConnexion.executeRequete(conn,"select idmatch, date_match, heure_match, idj1, idj2 from MATCH_SIMPLE");
             while (rset.next()) {
                 listeMatchSimple.put(rset.getInt(1), new MatchSimple(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getInt(4),rset.getInt(5)));
             }

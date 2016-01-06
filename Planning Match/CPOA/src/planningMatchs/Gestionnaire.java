@@ -5,6 +5,7 @@
  */
 package planningMatchs;
 
+import connexion.ConfigConnexion;
 import metiers.Joueur;
 import metiers.MatchSimple;
 import java.awt.BorderLayout;
@@ -12,11 +13,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -24,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -38,6 +43,8 @@ import metiers.MatchDouble;
  * @author Ben
  */
 public class Gestionnaire extends JFrame {
+    
+    private final Connection CONNEXION;
     
     private final JPanel application = new JPanel(new GridLayout(1,2));
     private final JPanel planning = new JPanel(new BorderLayout());
@@ -58,11 +65,11 @@ public class Gestionnaire extends JFrame {
     final static String AJOUTERJOUEUR = "Ajouter un Joueur";
     final static String LISTEJOUEUR = "Liste Joueur";
     
-    public Gestionnaire() {
+    public Gestionnaire(Connection connexion) {
         super();
-        
+        this.CONNEXION = connexion;
         //Mise à jour de la liste des joueurs
-        Joueur.updateListJoueurs();
+        Joueur.updateListJoueurs(CONNEXION);
         this.liste = Joueur.getListeJoueurs();
         
         //Construction de tous panels de l'application
@@ -102,18 +109,14 @@ public class Gestionnaire extends JFrame {
         JLabel ven = new JLabel("Vendredi");
         JLabel sam = new JLabel("Samedi");
         dimanche.setLayout(new GridLayout(5,2));//Une grille avec les 5 matchs simples d'un côté et les 5 matchs doubles de l'autre
-        MatchSimple.updateListMatchSimple();
-        for (MatchSimple m : MatchSimple.listeMatchSimple.values()) {
-            if (m.getDate().equals("31/01/16")) {
-                dimanche.add(new JLabel("S - "+m.getHeure()+" : "+m.getJ1().s()+ " VS "+m.getJ2().s()));
-            }
-        }
-        MatchDouble.updateListMatchDouble();
-        for (MatchDouble m : MatchDouble.listeMatchDouble.values()) {
-            if (m.getDate().equals("31/01/16")) {
-                dimanche.add(new JLabel("D - "+m.getHeure()+" : "+m.getA1().s()+" et "+m.getA2().s()+" VS "+m.getB1().s()+" et "+m.getB2().s()));
-            }
-        }
+        MatchSimple.updateListMatchSimple(CONNEXION);
+        MatchSimple.listeMatchSimple.values().stream().filter((m) -> (m.getDate().equals("31/01/16"))).forEach((m) -> {
+            dimanche.add(new JLabel("S - "+m.getHeure()+" : "+m.getJ1().s()+ " VS "+m.getJ2().s()));
+        });
+        MatchDouble.updateListMatchDouble(CONNEXION);
+        MatchDouble.listeMatchDouble.values().stream().filter((m) -> (m.getDate().equals("31/01/16"))).forEach((m) -> {
+            dimanche.add(new JLabel("D - "+m.getHeure()+" : "+m.getA1().s()+" et "+m.getA2().s()+" VS "+m.getB1().s()+" et "+m.getB2().s()));
+        });
         //dimanche.setMaximumSize(new Dimension(420, 200));
         day1.add(dimanche);
         matchs.add(day1);
@@ -255,7 +258,7 @@ public class Gestionnaire extends JFrame {
         
         doubl.add(new JLabel("Avec"));
         
-        //Sélection A2
+        //Sélection B2
         JPanel b2Pane = new JPanel();
         b2Pane.setLayout(new BoxLayout(b2Pane, BoxLayout.LINE_AXIS));
         b2Pane.add(new JLabel("Joueur B2 :"));
@@ -269,6 +272,16 @@ public class Gestionnaire extends JFrame {
         doubl.add(b2Pane);
         
         doubl.setVisible(false);
+        
+        //Regroupement de tous les combobox dans un array
+        ArrayList<JComboBox> comboJ = new ArrayList();
+        comboJ.add(j1);
+        comboJ.add(j2);
+        comboJ.add(a1);
+        comboJ.add(a2);
+        comboJ.add(b1);
+        comboJ.add(b2);
+        
         ajoutMatch.add(doubl);
         
         ajoutMatch.add(Box.createVerticalGlue());
@@ -315,12 +328,12 @@ public class Gestionnaire extends JFrame {
             if (group.getSelection().getActionCommand().equals("Simple")) {
                 System.out.println("Simple");
                 MatchSimple m = new MatchSimple("31/01/16",heure.getSelectedIndex(),liste.get(j1.getSelectedIndex()+1),liste.get(j2.getSelectedIndex()+1));
-                m.ajouterMatchSimple();
+                m.ajouterMatchSimple(CONNEXION);
             }
             else if(group.getSelection().getActionCommand().equals("Double")) {
                 System.out.println("Double");
                 MatchDouble m = new MatchDouble("31/01/16",heure.getSelectedIndex(),liste.get(a1.getSelectedIndex()+1),liste.get(a2.getSelectedIndex()+1),liste.get(b1.getSelectedIndex()+1),liste.get(b2.getSelectedIndex()+1));
-                m.ajouterMatchDouble();
+                m.ajouterMatchDouble(CONNEXION);
             }
             updateApp();
         });
@@ -355,8 +368,19 @@ public class Gestionnaire extends JFrame {
         JButton submit = new JButton("Valider");
         submit.addActionListener((ActionEvent ae) -> {
             Joueur nouvJ = new Joueur(textNom.getText(), textPrenom.getText(), comboNationalite.getSelectedItem().toString());
-            nouvJ.ajouterJoueur();
-            listeJoueur.add(new JLabel(nouvJ.toString()));
+            try {
+                nouvJ.ajouterJoueur(CONNEXION);
+            } catch (SQLIntegrityConstraintViolationException ex) {
+                JOptionPane.showMessageDialog(tabGestion,
+                "Erreur de contrainte d'intégrité",
+                "SQLIntegrityConstraintViolationException",
+                JOptionPane.ERROR_MESSAGE);
+            }
+            liste.put(nouvJ.getIdJoueur(),nouvJ);
+            updatePanelJoueur();
+            for (JComboBox jc : comboJ) {
+                jc.addItem(nouvJ.getPrenom()+" "+nouvJ.getNom());
+            }
             textNom.setText("");
             textPrenom.setText("");
         });
@@ -368,9 +392,7 @@ public class Gestionnaire extends JFrame {
         
         //Onglet Liste Joueur
         listeJoueur.setLayout(new BoxLayout(listeJoueur, BoxLayout.PAGE_AXIS));
-        liste.values().stream().forEach((j) -> {
-            listeJoueur.add(new JLabel(j.toString()));
-        }); //Fin Liste Joueur
+        updatePanelJoueur();
         
         //Ajout des onglets au Panel tabGestion
         tabGestion.addTab(AJOUTERMATCH, ajoutMatch);
@@ -382,9 +404,21 @@ public class Gestionnaire extends JFrame {
         System.out.println("Update");
     }
     
+    public void updatePanelJoueur() {
+        liste.values().stream().forEach((j) -> {
+            listeJoueur.add(new JLabel(j.toString()));
+        });
+    }
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Gestionnaire appli = new Gestionnaire();// On crée l'objet Gestionnaire qui instancie la fenêtre
+            Gestionnaire appli = null;
+            try {
+                Connection connexion = ConfigConnexion.getConnection("connexion.properties");
+                appli = new Gestionnaire(connexion); // On crée l'objet Gestionnaire qui instancie la fenêtre
+            } catch (IOException | ClassNotFoundException | SQLException ex) {
+                Logger.getLogger(Gestionnaire.class.getName()).log(Level.SEVERE, null, ex);
+            }
             appli.setVisible(true);// Et on la rend visible quand l'ordinateur est prêt
         });
     }

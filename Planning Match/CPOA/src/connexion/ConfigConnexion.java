@@ -95,30 +95,26 @@ public class ConfigConnexion {
      */
     public static Statement getStatement() throws IOException, ClassNotFoundException, SQLException {
         Connection conn = getConnection ("connexion.properties");
+        conn.close();
         return conn.createStatement();
     }
     
     /**
      * Méthode pour exécuter une requête passée en paramètre
-     * @param requete
+     * @param conn Une connexion à la base
+     * @param requete String contenant la requête SQL
      * @return un ResultSet contenant le résultat de la requête
      */
-    public static ResultSet executeRequete(String requete) {
+    public static ResultSet executeRequete(Connection conn, String requete) {
         ResultSet rset = null;
         try {
             Class.forName ("oracle.jdbc.OracleDriver");
-
-            // Connexion à la base et innstanciation de Statement et ResultSet
-            Connection conn = getConnection ("connexion.properties"); // Creation et execution d'un ordre SQL
             Statement stmt = conn.createStatement();
             System.out.println("Reqête SQl envoyée :\n"+requete);
             rset = stmt.executeQuery (requete);
         }
         catch (ClassNotFoundException e) {
             System.err.println("La classe n'a pas été trouvée :"+e.getMessage());
-        }
-        catch (IOException e) {
-            System.err.println("Problème d'entrée-sortie : "+e.getMessage()+". "+e.getLocalizedMessage());
         }
         catch (SQLException e) {
             System.out.println (" Capture d'une SQLException :");
@@ -135,41 +131,5 @@ public class ConfigConnexion {
             System.err.println("Une exception a été soulevée : "+e.getMessage());
         }
         return rset;
-    }
-    
-    public static int executeMAJ(String requete) {
-        int result = 0;
-        try {
-            Class.forName ("oracle.jdbc.OracleDriver");
-
-            try ( // Connexion à la base et innstanciation de Statement et ResultSet
-                    Connection conn = getConnection ("connexion.properties") // Creation et execution d'un ordre SQL
-                    ; Statement stmt = conn.createStatement()) {
-                System.out.println("Reqête SQl envoyée :\n"+requete);
-                PreparedStatement prepare = conn.prepareStatement(requete);
-                result = prepare.executeUpdate (requete);
-            }
-        }
-        catch (ClassNotFoundException e) {
-            System.err.println("La classe n'a pas été trouvée :"+e.getMessage());
-        }
-        catch (IOException e) {
-            System.err.println("Problème d'entrée-sortie : "+e.getMessage());
-        }
-        catch (SQLException e) {
-            System.out.println (" Capture d'une SQLException :");
-            while (e != null) {
-                System.out.print ("SQLSTATE: " + e.getSQLState ( ));
-                System.out.print (" Message: " + e.getMessage ( ));
-                System.out.println (" Code d’erreur vendeur: " + e.getErrorCode( ));
-                e.printStackTrace(System.out);
-                e = e.getNextException();
-                System.out.println (" ");
-            }
-        }
-        catch (Exception e) {
-            System.err.println("Une exception a été soulevée : "+e.getMessage());
-        }
-        return result;
     }
 }

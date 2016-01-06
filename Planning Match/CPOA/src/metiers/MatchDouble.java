@@ -6,8 +6,6 @@
 package metiers;
 
 import connexion.ConfigConnexion;
-import static connexion.ConfigConnexion.getConnection;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -78,23 +76,23 @@ public class MatchDouble extends Match {
         return "Match Double : "+a1.getPrenom()+" "+a1.getNom()+" et "+a2.getPrenom()+" "+a2.getNom()+"\n\tVS\n"+b1.getPrenom()+" "+b1.getNom()+" et "+b2.getPrenom()+" "+b2.getNom()+"\n"+getDate()+", à "+trancheHoraire;
     }
     
-    public void ajouterMatchDouble() {
+    /**
+     * Permet d'ajouter un match double à la base
+     * @param conn Une connexion à la base
+     */
+    public void ajouterMatchDouble(Connection conn) {
         try {
             String requete = "Insert into Match_Double(idMatch, idja1, idja2, idjb1, idjb2, date_match, heure_match) Values (?,?,?,?,?)";
-            try (Connection conn = getConnection ("connexion.properties")) {
-                PreparedStatement prepared = conn.prepareStatement(requete);
-                prepared.setInt(1,this.getIdMatch());
-                prepared.setInt(2,this.getA1().getIdJoueur());
-                prepared.setInt(3,this.getA2().getIdJoueur());
-                prepared.setInt(4,this.getB1().getIdJoueur());
-                prepared.setInt(5,this.getB2().getIdJoueur());
-                prepared.setString(6,this.getDate());
-                prepared.setInt(7,this.getHeure());
-                int result = prepared.executeUpdate();
-                System.out.println(result + " ligne(s) insérée(s)");
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
+            PreparedStatement prepared = conn.prepareStatement(requete);
+            prepared.setInt(1,this.getIdMatch());
+            prepared.setInt(2,this.getA1().getIdJoueur());
+            prepared.setInt(3,this.getA2().getIdJoueur());
+            prepared.setInt(4,this.getB1().getIdJoueur());
+            prepared.setInt(5,this.getB2().getIdJoueur());
+            prepared.setString(6,this.getDate());
+            prepared.setInt(7,this.getHeure());
+            int result = prepared.executeUpdate();
+            System.out.println(result + " ligne(s) insérée(s)");
         } catch (SQLSyntaxErrorException ex) {
             Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -104,10 +102,11 @@ public class MatchDouble extends Match {
     
     /**
      * Remet à jour la map contenant tous les matchs doubles indexés par les id
+     * @param conn Une connexion à la base
      */
-    public static void updateListMatchDouble() {
+    public static void updateListMatchDouble(Connection conn) {
         try {
-            ResultSet rset = ConfigConnexion.executeRequete("select idmatch, date_match, heure_match, idja1, idja2, idjb1, idjb2 from MATCH_DOUBLE");
+            ResultSet rset = ConfigConnexion.executeRequete(conn, "select idmatch, date_match, heure_match, idja1, idja2, idjb1, idjb2 from MATCH_DOUBLE");
             while (rset.next()) {
                 listeMatchDouble.put(rset.getInt(1), new MatchDouble(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getInt(4),rset.getInt(5), rset.getInt(6), rset.getInt(7)));
             }

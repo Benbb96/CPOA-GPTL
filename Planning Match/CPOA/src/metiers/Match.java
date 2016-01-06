@@ -6,6 +6,8 @@
 package metiers;
 
 import connexion.ConfigConnexion;
+import java.io.IOException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -18,6 +20,7 @@ import java.util.logging.Logger;
 public abstract class Match {
     
     private static int lastId = getLastId();
+    
     private int idMatch;
     private String date;
     private int heure; //0 = 8h ; 1 = 11h ; 2 = 15h ; 3 = 18h ; 4 = 21h
@@ -35,9 +38,11 @@ public abstract class Match {
     }
     
     public static int getLastId() {
-        int maxId = -1;
+        int maxId = -1; //pour gérer l'erreur
         try {
-            ResultSet rset = ConfigConnexion.executeRequete("SELECT MAX(idmatch)\n" +
+            Connection conn = ConfigConnexion.getConnection("connexion.properties");
+            ResultSet rset = ConfigConnexion.executeRequete(conn,
+                                                                "SELECT MAX(idmatch)\n" +
                                                                 "FROM\n" +
                                                                 "(\n" +
                                                                 "    SELECT idmatch\n" +
@@ -48,7 +53,7 @@ public abstract class Match {
                                                                 ")");
             rset.next();
             maxId = rset.getInt(1);
-        } catch  (SQLException ex) {
+        } catch  (IOException | ClassNotFoundException | SQLException ex) {
             Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
         }
         return maxId;
