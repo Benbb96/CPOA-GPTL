@@ -18,7 +18,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -50,16 +49,17 @@ public class Gestionnaire extends JFrame {
     private final JPanel planning = new JPanel(new BorderLayout());
     private final JTabbedPane tabGestion = new JTabbedPane();
     
-    private final Map<Integer, Joueur> liste;
-    JPanel listeJoueur = new JPanel();
+    private final JPanel listeJoueur = new JPanel();
     
-    JPanel dimanche = new JPanel(new BorderLayout());
-    JPanel lundi = new JPanel(new BorderLayout());
-    JPanel mardi = new JPanel(new BorderLayout());
-    JPanel mercredi = new JPanel(new BorderLayout());
-    JPanel jeudi = new JPanel(new BorderLayout());
-    JPanel vendredi = new JPanel(new BorderLayout());
-    JPanel samedi = new JPanel(new BorderLayout());
+    private final JourPlanning dimanche = new JourPlanning("31/01/16");
+    private final JourPlanning lundi = new JourPlanning("01/02/16");
+    private final JourPlanning mardi = new JourPlanning("02/02/16");
+    private final JourPlanning mercredi = new JourPlanning("03/02/16");
+    private final JourPlanning jeudi = new JourPlanning("04/02/16");
+    private final JourPlanning vendredi = new JourPlanning("05/02/16");
+    private final JourPlanning samedi = new JourPlanning("06/02/16");
+    
+    private final ArrayList<JourPlanning> jours = new ArrayList();
     
     final static String AJOUTERMATCH = "Ajouter un Match";
     final static String AJOUTERJOUEUR = "Ajouter un Joueur";
@@ -70,7 +70,15 @@ public class Gestionnaire extends JFrame {
         this.CONNEXION = connexion;
         //Mise à jour de la liste des joueurs
         Joueur.updateListJoueurs(CONNEXION);
-        this.liste = Joueur.getListeJoueurs();
+        
+        //Regroupement de tous les JourPlanning dans l'array list
+        jours.add(dimanche);
+        jours.add(lundi);
+        jours.add(mardi);
+        jours.add(mercredi);
+        jours.add(jeudi);
+        jours.add(vendredi);
+        jours.add(samedi);
         
         //Construction de tous panels de l'application
         build();
@@ -85,6 +93,7 @@ public class Gestionnaire extends JFrame {
         
         //Construire la fenêtre Planning
         planning();
+        updateApp();
         
         //Construire la fenêtre avec les différents onglets de gestion
         tabGestion();
@@ -97,34 +106,24 @@ public class Gestionnaire extends JFrame {
     public void planning() {
         //Se connecter à la base de donnée pour récupérer les matchs existants
         //Puis les afficher un à un dans le planning (CardLayout)
-        JPanel matchs = new JPanel(new GridLayout(6,1));
-        JLabel dim = new JLabel("Dimanche");
-        JPanel day1 = new JPanel();
-        day1.setLayout(new BoxLayout(day1, BoxLayout.PAGE_AXIS));
-        day1.add(dim);
-        JLabel lun = new JLabel("Lundi");
-        JLabel mar = new JLabel("Mardi");
-        JLabel mer = new JLabel("Mercredi");
-        JLabel jeu = new JLabel("Jeudi");
-        JLabel ven = new JLabel("Vendredi");
-        JLabel sam = new JLabel("Samedi");
-        dimanche.setLayout(new GridLayout(5,2));//Une grille avec les 5 matchs simples d'un côté et les 5 matchs doubles de l'autre
-        MatchSimple.updateListMatchSimple(CONNEXION);
-        MatchSimple.listeMatchSimple.values().stream().filter((m) -> (m.getDate().equals("31/01/16"))).forEach((m) -> {
-            dimanche.add(new JLabel("S - "+m.getHeure()+" : "+m.getJ1().s()+ " VS "+m.getJ2().s()));
-        });
-        MatchDouble.updateListMatchDouble(CONNEXION);
-        MatchDouble.listeMatchDouble.values().stream().filter((m) -> (m.getDate().equals("31/01/16"))).forEach((m) -> {
-            dimanche.add(new JLabel("D - "+m.getHeure()+" : "+m.getA1().s()+" et "+m.getA2().s()+" VS "+m.getB1().s()+" et "+m.getB2().s()));
-        });
-        //dimanche.setMaximumSize(new Dimension(420, 200));
-        day1.add(dimanche);
-        matchs.add(day1);
-        matchs.add(lun);
-        matchs.add(mar);
-        matchs.add(mer);
-        matchs.add(jeu);
-        matchs.add(ven);
+        JPanel matchs = new JPanel(new GridLayout(7,1));
+        ArrayList<JLabel> nomsJour = new ArrayList();
+        nomsJour.add(new JLabel("Dimanche 31"));
+        nomsJour.add(new JLabel("Lundi 1"));
+        nomsJour.add(new JLabel("Mardi 2"));
+        nomsJour.add(new JLabel("Mercredi 3"));
+        nomsJour.add(new JLabel("Jeudi 4"));
+        nomsJour.add(new JLabel("Vendredi 5"));
+        nomsJour.add(new JLabel("Samedi 6"));
+        int i = 0;
+        for (JourPlanning j : jours) {
+            JPanel pan = new JPanel();
+            pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
+            pan.add(nomsJour.get(i));
+            pan.add(j);
+            matchs.add(pan);
+            i++;
+        }
         JScrollPane scroll = new JScrollPane(matchs);
         JPanel enTete = new JPanel();
         enTete.setLayout(new BoxLayout(enTete, BoxLayout.LINE_AXIS));
@@ -185,7 +184,7 @@ public class Gestionnaire extends JFrame {
         j1Pane.add(new JLabel("Joueur 1 :"));
         j1Pane.add(Box.createHorizontalStrut(20));
         JComboBox j1 = new JComboBox();
-        liste.values().stream().forEach((j) -> {
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             j1.addItem(j.getPrenom()+" "+j.getNom());
         });
         j1.setMaximumSize(new Dimension(140,25));
@@ -200,7 +199,7 @@ public class Gestionnaire extends JFrame {
         j2Pane.add(new JLabel("Joueur 2 :"));
         j2Pane.add(Box.createHorizontalStrut(20));
         JComboBox j2 = new JComboBox();
-        liste.values().stream().forEach((j) -> {
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             j2.addItem(j.getPrenom()+" "+j.getNom());
         });
         j2.setMaximumSize(new Dimension(140,25));
@@ -217,7 +216,7 @@ public class Gestionnaire extends JFrame {
         a1Pane.add(new JLabel("Joueur A1 :"));
         a1Pane.add(Box.createHorizontalStrut(20));
         JComboBox a1 = new JComboBox();
-        liste.values().stream().forEach((j) -> {
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             a1.addItem(j.getPrenom()+" "+j.getNom());
         });
         a1.setMaximumSize(new Dimension(140,25));
@@ -232,7 +231,7 @@ public class Gestionnaire extends JFrame {
         a2Pane.add(new JLabel("Joueur A2 :"));
         a2Pane.add(Box.createHorizontalStrut(20));
         JComboBox a2 = new JComboBox();
-        liste.values().stream().forEach((j) -> {
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             a2.addItem(j.getPrenom()+" "+j.getNom());
         });
         a2.setMaximumSize(new Dimension(140,25));
@@ -249,7 +248,7 @@ public class Gestionnaire extends JFrame {
         b1Pane.add(new JLabel("Joueur B1 :"));
         b1Pane.add(Box.createHorizontalStrut(20));
         JComboBox b1 = new JComboBox();
-        liste.values().stream().forEach((j) -> {
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             b1.addItem(j.getPrenom()+" "+j.getNom());
         });
         b1.setMaximumSize(new Dimension(140,25));
@@ -264,7 +263,7 @@ public class Gestionnaire extends JFrame {
         b2Pane.add(new JLabel("Joueur B2 :"));
         b2Pane.add(Box.createHorizontalStrut(20));
         JComboBox b2 = new JComboBox();
-        liste.values().stream().forEach((j) -> {
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             b2.addItem(j.getPrenom()+" "+j.getNom());
         });
         b2.setMaximumSize(new Dimension(140,25));
@@ -286,7 +285,6 @@ public class Gestionnaire extends JFrame {
         
         ajoutMatch.add(Box.createVerticalGlue());
         
-        /* On ne fera que les matchs de qualification
         //Choix du tour du match
         JPanel tour = new JPanel(new FlowLayout());
         tour.add(new JLabel("Tour"));
@@ -301,13 +299,12 @@ public class Gestionnaire extends JFrame {
         choixTour.addItem("Finale");
         tour.add(choixTour);
         ajoutMatch.add(tour);
-        */
         
-        /*
         JPanel date = new JPanel(new FlowLayout());
-        date.add(new JLabel("Date"));
-        JTextField jour = new JTextField(2);
-        */
+        date.add(new JLabel("Date (jj/mm/aa)"));
+        JTextField jour = new JTextField(8);
+        date.add(jour);
+        ajoutMatch.add(date);
         
         JPanel crenau = new JPanel(new FlowLayout());
         crenau.add(new JLabel("Heure (crénau)"));
@@ -327,15 +324,34 @@ public class Gestionnaire extends JFrame {
             System.out.print("Ajout Match ");
             if (group.getSelection().getActionCommand().equals("Simple")) {
                 System.out.println("Simple");
-                MatchSimple m = new MatchSimple("31/01/16",heure.getSelectedIndex(),liste.get(j1.getSelectedIndex()+1),liste.get(j2.getSelectedIndex()+1));
-                m.ajouterMatchSimple(CONNEXION);
+                MatchSimple m = new MatchSimple(jour.getText(),heure.getSelectedIndex(),choixTour.getSelectedItem().toString(),
+                        Joueur.getListeJoueurs().get(j1.getSelectedIndex()+1),
+                        Joueur.getListeJoueurs().get(j2.getSelectedIndex()+1));
+                try {
+                    m.ajouterMatchSimple(CONNEXION);
+                } catch (SQLIntegrityConstraintViolationException ex) {
+                    JOptionPane.showMessageDialog(tabGestion,
+                    "Il existe déjà un match au même moment",
+                    "SQLIntegrityConstraintViolationException",
+                    JOptionPane.ERROR_MESSAGE);
+                }
             }
             else if(group.getSelection().getActionCommand().equals("Double")) {
                 System.out.println("Double");
-                MatchDouble m = new MatchDouble("31/01/16",heure.getSelectedIndex(),liste.get(a1.getSelectedIndex()+1),liste.get(a2.getSelectedIndex()+1),liste.get(b1.getSelectedIndex()+1),liste.get(b2.getSelectedIndex()+1));
-                m.ajouterMatchDouble(CONNEXION);
+                MatchDouble m = new MatchDouble(jour.getText(),heure.getSelectedIndex(),choixTour.getSelectedItem().toString(),
+                        Joueur.getListeJoueurs().get(a1.getSelectedIndex()+1),
+                        Joueur.getListeJoueurs().get(a2.getSelectedIndex()+1),
+                        Joueur.getListeJoueurs().get(b1.getSelectedIndex()+1),
+                        Joueur.getListeJoueurs().get(b2.getSelectedIndex()+1));
+                try {
+                    m.ajouterMatchDouble(CONNEXION);
+                } catch (SQLIntegrityConstraintViolationException ex) {
+                    JOptionPane.showMessageDialog(tabGestion,
+                    "Il existe déjà un match au même moment",
+                    "SQLIntegrityConstraintViolationException",
+                    JOptionPane.ERROR_MESSAGE);
+                }
             }
-            updateApp();
         });
         ajoutMatch.add(valider);
         //Fin onglet Ajout Match
@@ -376,11 +392,11 @@ public class Gestionnaire extends JFrame {
                 "SQLIntegrityConstraintViolationException",
                 JOptionPane.ERROR_MESSAGE);
             }
-            liste.put(nouvJ.getIdJoueur(),nouvJ);
-            updatePanelJoueur();
-            for (JComboBox jc : comboJ) {
-                jc.addItem(nouvJ.getPrenom()+" "+nouvJ.getNom());
-            }
+            Joueur.getListeJoueurs().put(nouvJ.getIdJoueur(),nouvJ);//On ajoute le joueur à la liste de tous les joueurs
+            updatePanelJoueur();//On remet à jour le conteneur de la liste des joueurs
+            comboJ.stream().forEach((jc) -> {
+                jc.addItem(nouvJ.getPrenom()+" "+nouvJ.getNom());//On ajoute le nouveau joueurs sur chaque combo box
+            });
             textNom.setText("");
             textPrenom.setText("");
         });
@@ -401,11 +417,18 @@ public class Gestionnaire extends JFrame {
     }
     
     public void updateApp() {
-        System.out.println("Update");
+        System.out.println("\tUpdate Planning");
+        MatchSimple.updateListMatchSimple(CONNEXION);
+        MatchDouble.updateListMatchDouble(CONNEXION);
+        jours.stream().forEach((j) -> {
+            j.updateJour();
+        });
+        this.revalidate();// Remet à jour les boutons des matchs
     }
     
     public void updatePanelJoueur() {
-        liste.values().stream().forEach((j) -> {
+        listeJoueur.removeAll();
+        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             listeJoueur.add(new JLabel(j.toString()));
         });
     }

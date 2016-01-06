@@ -12,10 +12,12 @@ package metiers;
 public class Arbitre extends Personne {
     
     private int idArbitre = 0;
+    private static int lastId;
 
     public Arbitre(String nom, String prenom, String nationalite) {
         super(nom, prenom, nationalite);
-        this.idArbitre = idArbitre++;
+        this.idArbitre = ++lastId;
+        lastId = idArbitre;
     }
     
     public int getIdArbitre() {return idArbitre;}

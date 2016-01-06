@@ -110,7 +110,7 @@ public class ConfigConnexion {
         try {
             Class.forName ("oracle.jdbc.OracleDriver");
             Statement stmt = conn.createStatement();
-            System.out.println("Reqête SQl envoyée :\n"+requete);
+            System.out.println("Reqête SQl envoyée : "+requete);
             rset = stmt.executeQuery (requete);
         }
         catch (ClassNotFoundException e) {

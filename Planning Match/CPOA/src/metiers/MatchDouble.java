@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,24 +30,24 @@ public class MatchDouble extends Match {
     private Joueur b1; // Equipe B - Joueur 1
     private Joueur b2; // Equipe B - Joueur 2
 
-    public MatchDouble(String date, int heure, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
-        super(date, heure);
+    public MatchDouble(String date, int heure, String tour, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
+        super(date, heure, tour);
         this.a1 = a1;
         this.a2 = a2;
         this.b1 = b1;
         this.b2 = b2;
     }
     
-    public MatchDouble(int idMatchDouble, String date, int heure, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
-        super(idMatchDouble, date, heure);
+    public MatchDouble(int idMatchDouble, String date, int heure, String tour, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
+        super(idMatchDouble, date, heure, tour);
         this.a1 = a1;
         this.a2 = a2;
         this.b1 = b1;
         this.b2 = b2;
     }
     
-    public MatchDouble(int idMatch, String date, int heure, int a1, int a2, int b1, int b2) {
-        super(idMatch, date, heure);
+    public MatchDouble(int idMatch, String date, int heure, String tour, int a1, int a2, int b1, int b2) {
+        super(idMatch, date, heure, tour);
         this.a1 = Joueur.listeJoueurs.get(a1);
         this.a2 = Joueur.listeJoueurs.get(a2);
         this.b1 = Joueur.listeJoueurs.get(b1);
@@ -73,16 +74,17 @@ public class MatchDouble extends Match {
             case 4: trancheHoraire = "21h"; break;
             default : trancheHoraire = "Non défini";
         }
-        return "Match Double : "+a1.getPrenom()+" "+a1.getNom()+" et "+a2.getPrenom()+" "+a2.getNom()+"\n\tVS\n"+b1.getPrenom()+" "+b1.getNom()+" et "+b2.getPrenom()+" "+b2.getNom()+"\n"+getDate()+", à "+trancheHoraire;
+        return "Match Double ("+getTour()+") : "+a1.getPrenom()+" "+a1.getNom()+" et "+a2.getPrenom()+" "+a2.getNom()+"\n\tVS\n"+b1.getPrenom()+" "+b1.getNom()+" et "+b2.getPrenom()+" "+b2.getNom()+"\n"+getDate()+", à "+trancheHoraire;
     }
     
     /**
      * Permet d'ajouter un match double à la base
      * @param conn Une connexion à la base
+     * @throws java.sql.SQLIntegrityConstraintViolationException
      */
-    public void ajouterMatchDouble(Connection conn) {
+    public void ajouterMatchDouble(Connection conn) throws SQLIntegrityConstraintViolationException {
         try {
-            String requete = "Insert into Match_Double(idMatch, idja1, idja2, idjb1, idjb2, date_match, heure_match) Values (?,?,?,?,?)";
+            String requete = "Insert into Match_Double(idMatch, idja1, idja2, idjb1, idjb2, date_match, heure_match, tour_match) Values (?,?,?,?,?,?,?,?)";
             PreparedStatement prepared = conn.prepareStatement(requete);
             prepared.setInt(1,this.getIdMatch());
             prepared.setInt(2,this.getA1().getIdJoueur());
@@ -91,8 +93,11 @@ public class MatchDouble extends Match {
             prepared.setInt(5,this.getB2().getIdJoueur());
             prepared.setString(6,this.getDate());
             prepared.setInt(7,this.getHeure());
+            prepared.setString(8, this.getTour());
             int result = prepared.executeUpdate();
             System.out.println(result + " ligne(s) insérée(s)");
+        } catch (SQLIntegrityConstraintViolationException ex) {
+            throw new SQLIntegrityConstraintViolationException();
         } catch (SQLSyntaxErrorException ex) {
             Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -105,10 +110,12 @@ public class MatchDouble extends Match {
      * @param conn Une connexion à la base
      */
     public static void updateListMatchDouble(Connection conn) {
+        System.out.println("Remise à jour de la liste des matchs en double.");
+        listeMatchDouble.clear();
         try {
-            ResultSet rset = ConfigConnexion.executeRequete(conn, "select idmatch, date_match, heure_match, idja1, idja2, idjb1, idjb2 from MATCH_DOUBLE");
+            ResultSet rset = ConfigConnexion.executeRequete(conn, "select idmatch, date_match, heure_match, tour_match, idja1, idja2, idjb1, idjb2 from MATCH_DOUBLE order by heure_match");
             while (rset.next()) {
-                listeMatchDouble.put(rset.getInt(1), new MatchDouble(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getInt(4),rset.getInt(5), rset.getInt(6), rset.getInt(7)));
+                listeMatchDouble.put(rset.getInt(1), new MatchDouble(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4),rset.getInt(5), rset.getInt(6), rset.getInt(7), rset.getInt(8)));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);

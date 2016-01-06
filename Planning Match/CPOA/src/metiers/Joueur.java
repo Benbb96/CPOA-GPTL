@@ -74,6 +74,7 @@ public class Joueur extends Personne {
      * @param connexion Une connexion à la base
      */
     public static void updateListJoueurs(Connection connexion) {
+        System.out.println("Remise à jour de la liste des Joueurs");
         try {
             ResultSet rset = ConfigConnexion.executeRequete(connexion,"select idjoueur, nom, prenom, nationalite from JOUEUR order by idjoueur");
             while (rset.next()) {
