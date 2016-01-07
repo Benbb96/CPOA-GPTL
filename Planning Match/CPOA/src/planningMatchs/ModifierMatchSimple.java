@@ -216,6 +216,27 @@ public class ModifierMatchSimple extends JDialog{
                         0;
             }
         });
+        
+        JButton deleteBouton = new JButton("Supprimer le match");
+        deleteBouton.addActionListener((ActionEvent ae) -> {
+            try {
+                String requete = "Delete From Match_Simple Where idMatch=?";
+                PreparedStatement prepared = connexion.prepareStatement(requete);
+                prepared.setInt(1,match.getIdMatch());
+                int result = prepared.executeUpdate();
+                System.out.println(result + " ligne(s) modifiée(s)");
+            } catch (SQLSyntaxErrorException ex) {
+                Logger.getLogger(ModifierMatchSimple.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(ModifierMatchSimple.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            MatchSimple remove = MatchSimple.listeMatchSimple.remove(match.getIdMatch());
+            setVisible(false);
+            JOptionPane.showMessageDialog(parent,
+                "Le match simple de "+remove.getRealTime()+" a bien été supprimé.",
+                "Suppresion réussie",
+                JOptionPane.INFORMATION_MESSAGE);
+        });
 
         JButton cancelBouton = new JButton("Annuler");
         cancelBouton.addActionListener((ActionEvent arg0) -> {
@@ -223,6 +244,7 @@ public class ModifierMatchSimple extends JDialog{
         });
 
         control.add(okBouton);
+        control.add(deleteBouton);
         control.add(cancelBouton);
 
         //this.getContentPane().add(panIcon, BorderLayout.WEST);

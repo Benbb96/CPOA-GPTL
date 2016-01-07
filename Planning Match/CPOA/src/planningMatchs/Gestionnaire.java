@@ -94,7 +94,7 @@ public class Gestionnaire extends JFrame {
     
     private void build() {
         this.setTitle("Gestionnaire Match");
-        this.setSize(800, 500);
+        this.setSize(900, 500);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -145,6 +145,7 @@ public class Gestionnaire extends JFrame {
         enTete.add(update);
         planning.add(enTete, BorderLayout.NORTH);
         planning.add(scroll, BorderLayout.CENTER);
+        planning.setSize(new Dimension(600,500));
     }
     
     public void tabGestion() {
@@ -444,14 +445,13 @@ public class Gestionnaire extends JFrame {
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Gestionnaire appli = null;
             try {
                 Connection connexion = ConfigConnexion.getConnection("connexion.properties");
-                appli = new Gestionnaire(connexion); // On crée l'objet Gestionnaire qui instancie la fenêtre
+                Gestionnaire appli = new Gestionnaire(connexion); // On crée l'objet Gestionnaire qui instancie la fenêtre
+                appli.setVisible(true);// Et on la rend visible quand l'ordinateur est prêt
             } catch (IOException | ClassNotFoundException | SQLException ex) {
                 Logger.getLogger(Gestionnaire.class.getName()).log(Level.SEVERE, null, ex);
             }
-            appli.setVisible(true);// Et on la rend visible quand l'ordinateur est prêt
         });
     }
 }

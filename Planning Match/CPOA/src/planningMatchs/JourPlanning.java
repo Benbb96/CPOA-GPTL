@@ -28,8 +28,8 @@ public class JourPlanning extends JPanel {
         this.parent = parent;
         this.date = date;
         this.connexion = conn;
-        matchSimple = new JPanel(new GridLayout(5,1));
-        matchDouble = new JPanel(new GridLayout(5,1));
+        matchSimple = new JPanel(new GridLayout(3,2));
+        matchDouble = new JPanel(new GridLayout(3,2));
         this.add(matchSimple);
         this.add(matchDouble);
     }
