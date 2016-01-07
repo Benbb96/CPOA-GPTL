@@ -69,6 +69,10 @@ public class Joueur extends Personne {
         return "Joueur n°"+this.getIdJoueur()+" : "+this.getPrenom()+" "+this.getNom()+" - "+this.getNationalite()+" - "+this.getClassement();
     }
     
+    public String prenomNom() {
+        return getPrenom()+" "+getNom();
+    }
+    
     /**
      * Remet à jour la map contenant tous les joueurs indexés par leur numéro de joueur
      * @param connexion Une connexion à la base

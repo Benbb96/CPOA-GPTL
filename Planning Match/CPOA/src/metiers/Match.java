@@ -64,6 +64,17 @@ public abstract class Match {
         }
     }
     
+    public String getRealTime() {
+        switch (heure) {
+            case 0 : return "8h";
+            case 1 : return "11h";
+            case 2 : return "15h";
+            case 3 : return "18h";
+            case 4 : return "21h";
+            default : return "Erreur Horaire !";
+        }
+    }
+    
     public int getIdMatch() {return idMatch;}
     public String getDate() {return date;}
     public int getHeure() {return heure;}

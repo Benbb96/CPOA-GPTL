@@ -51,13 +51,13 @@ public class Gestionnaire extends JFrame {
     
     private final JPanel listeJoueur = new JPanel();
     
-    private final JourPlanning dimanche = new JourPlanning("31/01/16");
-    private final JourPlanning lundi = new JourPlanning("01/02/16");
-    private final JourPlanning mardi = new JourPlanning("02/02/16");
-    private final JourPlanning mercredi = new JourPlanning("03/02/16");
-    private final JourPlanning jeudi = new JourPlanning("04/02/16");
-    private final JourPlanning vendredi = new JourPlanning("05/02/16");
-    private final JourPlanning samedi = new JourPlanning("06/02/16");
+    private final JourPlanning dimanche;
+    private final JourPlanning lundi;
+    private final JourPlanning mardi;
+    private final JourPlanning mercredi;
+    private final JourPlanning jeudi;
+    private final JourPlanning vendredi;
+    private final JourPlanning samedi;
     
     private final ArrayList<JourPlanning> jours = new ArrayList();
     
@@ -70,6 +70,14 @@ public class Gestionnaire extends JFrame {
         this.CONNEXION = connexion;
         //Mise à jour de la liste des joueurs
         Joueur.updateListJoueurs(CONNEXION);
+        
+        dimanche = new JourPlanning(this,"31/01/16",CONNEXION);
+        lundi = new JourPlanning(this,"01/02/16",CONNEXION);
+        mardi = new JourPlanning(this,"02/02/16",CONNEXION);
+        mercredi = new JourPlanning(this,"03/02/16",CONNEXION);
+        jeudi = new JourPlanning(this,"04/02/16",CONNEXION);
+        vendredi = new JourPlanning(this,"05/02/16",CONNEXION);
+        samedi = new JourPlanning(this,"06/02/16",CONNEXION);
         
         //Regroupement de tous les JourPlanning dans l'array list
         jours.add(dimanche);
@@ -185,7 +193,7 @@ public class Gestionnaire extends JFrame {
         j1Pane.add(Box.createHorizontalStrut(20));
         JComboBox j1 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            j1.addItem(j.getPrenom()+" "+j.getNom());
+            j1.addItem(j.prenomNom());
         });
         j1.setMaximumSize(new Dimension(140,25));
         j1Pane.add(j1);
@@ -200,7 +208,7 @@ public class Gestionnaire extends JFrame {
         j2Pane.add(Box.createHorizontalStrut(20));
         JComboBox j2 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            j2.addItem(j.getPrenom()+" "+j.getNom());
+            j2.addItem(j.prenomNom());
         });
         j2.setMaximumSize(new Dimension(140,25));
         j2Pane.add(j2);
@@ -217,7 +225,7 @@ public class Gestionnaire extends JFrame {
         a1Pane.add(Box.createHorizontalStrut(20));
         JComboBox a1 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            a1.addItem(j.getPrenom()+" "+j.getNom());
+            a1.addItem(j.prenomNom());
         });
         a1.setMaximumSize(new Dimension(140,25));
         a1Pane.add(a1);
@@ -232,7 +240,7 @@ public class Gestionnaire extends JFrame {
         a2Pane.add(Box.createHorizontalStrut(20));
         JComboBox a2 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            a2.addItem(j.getPrenom()+" "+j.getNom());
+            a2.addItem(j.prenomNom());
         });
         a2.setMaximumSize(new Dimension(140,25));
         a2Pane.add(a2);
@@ -249,7 +257,7 @@ public class Gestionnaire extends JFrame {
         b1Pane.add(Box.createHorizontalStrut(20));
         JComboBox b1 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            b1.addItem(j.getPrenom()+" "+j.getNom());
+            b1.addItem(j.prenomNom());
         });
         b1.setMaximumSize(new Dimension(140,25));
         b1Pane.add(b1);
@@ -264,7 +272,7 @@ public class Gestionnaire extends JFrame {
         b2Pane.add(Box.createHorizontalStrut(20));
         JComboBox b2 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            b2.addItem(j.getPrenom()+" "+j.getNom());
+            b2.addItem(j.prenomNom());
         });
         b2.setMaximumSize(new Dimension(140,25));
         b2Pane.add(b2);
@@ -352,6 +360,7 @@ public class Gestionnaire extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
                 }
             }
+            updateApp();
         });
         ajoutMatch.add(valider);
         //Fin onglet Ajout Match

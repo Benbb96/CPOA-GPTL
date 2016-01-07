@@ -65,16 +65,11 @@ public class MatchDouble extends Match {
     
     @Override
     public String toString() {
-        String trancheHoraire;
-        switch(getHeure()) {
-            case 0: trancheHoraire = "8h"; break;
-            case 1: trancheHoraire = "11h"; break;
-            case 2: trancheHoraire = "15h"; break;
-            case 3: trancheHoraire = "18h"; break;
-            case 4: trancheHoraire = "21h"; break;
-            default : trancheHoraire = "Non défini";
-        }
-        return "Match Double ("+getTour()+") : "+a1.getPrenom()+" "+a1.getNom()+" et "+a2.getPrenom()+" "+a2.getNom()+"\n\tVS\n"+b1.getPrenom()+" "+b1.getNom()+" et "+b2.getPrenom()+" "+b2.getNom()+"\n"+getDate()+", à "+trancheHoraire;
+        return "Match Double ("+getTour()+") : "+a1.getPrenom()+" "+a1.getNom()+" et "+a2.getPrenom()+" "+a2.getNom()+"\n\tVS\n"+b1.getPrenom()+" "+b1.getNom()+" et "+b2.getPrenom()+" "+b2.getNom()+"\n"+getDate()+", à "+getRealTime();
+    }
+    
+    public String affiche() {
+        return "Match Double - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\n\n"+a1.prenomNom()+" et "+a2.prenomNom()+"\n      Contre\n"+b1.prenomNom()+" et "+b2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
     }
     
     /**

@@ -62,16 +62,11 @@ public class MatchSimple extends Match {
     
     @Override
     public String toString() {
-        String trancheHoraire;
-        switch(getHeure()) {
-            case 0: trancheHoraire = "8h"; break;
-            case 1: trancheHoraire = "11h"; break;
-            case 2: trancheHoraire = "15h"; break;
-            case 3: trancheHoraire = "18h"; break;
-            case 4: trancheHoraire = "21h"; break;
-            default : trancheHoraire = "Non défini";
-        }
-        return "Match Simple ("+getTour()+") : "+j1.getPrenom()+" "+j1.getNom()+" VS "+j2.getPrenom()+" "+j2.getNom()+" - "+getDate()+", à "+trancheHoraire;
+        return "Match Simple ("+getTour()+") : "+j1.prenomNom()+" VS "+j2.prenomNom()+" - "+getDate()+", à "+getRealTime();
+    }
+    
+    public String affiche() {
+        return "Match Simple - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\n\n"+j1.prenomNom()+" Contre "+j2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
     }
     
     /**

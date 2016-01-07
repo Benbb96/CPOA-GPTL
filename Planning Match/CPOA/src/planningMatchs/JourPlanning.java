@@ -5,10 +5,9 @@
  */
 package planningMatchs;
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.sql.Connection;
-import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import metiers.MatchDouble;
 import metiers.MatchSimple;
@@ -19,12 +18,16 @@ import metiers.MatchSimple;
  */
 public class JourPlanning extends JPanel {
     
+    private final JFrame parent;
     private final String date;
+    private final Connection connexion;
     private final JPanel matchSimple;
     private final JPanel matchDouble;
     
-    public JourPlanning(String date) {
+    public JourPlanning(JFrame parent, String date, Connection conn) {
+        this.parent = parent;
         this.date = date;
+        this.connexion = conn;
         matchSimple = new JPanel(new GridLayout(5,1));
         matchDouble = new JPanel(new GridLayout(5,1));
         this.add(matchSimple);
@@ -36,12 +39,12 @@ public class JourPlanning extends JPanel {
         //Simple
         matchSimple.removeAll();
         MatchSimple.listeMatchSimple.values().stream().filter((m) -> (m.getDate().equals(date))).forEach((m) -> {
-            matchSimple.add(new JButton("SIMPLE - "+m.getHeure()));
+            matchSimple.add(new JMatchSimple(parent, m, connexion));
         });
         //Double
         matchDouble.removeAll();
          MatchDouble.listeMatchDouble.values().stream().filter((m) -> (m.getDate().equals(date))).forEach((m) -> {
-            matchDouble.add(new JButton("DOUBLE - "+m.getHeure()));
+            matchDouble.add(new JMatchDouble(parent, m, connexion));
         });
     }
     
