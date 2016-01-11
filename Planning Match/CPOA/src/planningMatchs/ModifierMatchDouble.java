@@ -6,8 +6,6 @@
 package planningMatchs;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -40,41 +38,35 @@ import metiers.MatchSimple;
 public class ModifierMatchDouble extends JDialog{
     
     private final Connection connexion;
-    private final JFrame parent;
+    private final Gestionnaire parent;
     
     private final MatchDouble match;
     
+    private JLabel icon;
     private JComboBox a1, a2, b1, b2, date, tour;
     private JRadioButton h1, h2, h3, h4, h5;
-    private boolean sendData;
     
-    public ModifierMatchDouble(JFrame parent, String title, MatchDouble m, Connection conn){
+    public ModifierMatchDouble(Gestionnaire parent, String title, MatchDouble m, Connection conn){
         //On appelle le construteur de JDialog correspondant
         super(parent, title);
         this.parent = parent;
         match = m;
         this.connexion = conn;
-        this.setSize(600, 400);
+        this.setSize(700, 400);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.initComponent();
-    }
-    
-    public MatchDouble afficheD(){
-        this.sendData = false;
-        this.setVisible(true);      
-        return this.match;      
+        this.setVisible(true); 
     }
     
     private void initComponent(){
+        
         //Icône
-        /*
-        icon = new JLabel(new ImageIcon("images/icone.jpg"));
+        icon = new JLabel(new ImageIcon("images/double.jpg"));
         JPanel panIcon = new JPanel();
-        panIcon.setBackground(Color.white);
         panIcon.setLayout(new BorderLayout());
-        panIcon.add(icon);*/
+        panIcon.add(icon);
 
         //Choix des Joueurs de l'équipe 1
         JPanel choixJoueurs1 = new JPanel();
@@ -185,7 +177,6 @@ public class ModifierMatchDouble extends JDialog{
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.setBackground(Color.white);
         content.add(choixJoueurs1);
         content.add(choixJoueurs2);
         content.add(choixTour);
@@ -228,8 +219,8 @@ public class ModifierMatchDouble extends JDialog{
                 } catch (SQLException ex) {
                     Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
                 setVisible(false);
+                parent.updateApp();
             }
             
             public int getHeure() {
@@ -257,6 +248,7 @@ public class ModifierMatchDouble extends JDialog{
             }
             MatchDouble remove = MatchDouble.listeMatchDouble.remove(match.getIdMatch());
             setVisible(false);
+            parent.updateApp();
             JOptionPane.showMessageDialog(parent,
                 "Le match double de "+remove.getRealTime()+" a bien été supprimé.",
                 "Suppresion réussie",
@@ -272,7 +264,7 @@ public class ModifierMatchDouble extends JDialog{
         control.add(deleteBouton);
         control.add(cancelBouton);
 
-        //this.getContentPane().add(panIcon, BorderLayout.WEST);
+        this.getContentPane().add(panIcon, BorderLayout.WEST);
         this.getContentPane().add(content, BorderLayout.CENTER);
         this.getContentPane().add(control, BorderLayout.SOUTH);
     }

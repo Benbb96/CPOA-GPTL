@@ -6,8 +6,6 @@
 package planningMatchs;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -20,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -38,40 +37,35 @@ import metiers.MatchSimple;
 public class ModifierMatchSimple extends JDialog{
     
     private final Connection connexion;
-    private final JFrame parent;
+    private final Gestionnaire parent;
     
     private final MatchSimple match;
     
+    private JLabel icon;
     private JComboBox j1, j2, date, tour;
     private JRadioButton h1, h2, h3, h4, h5;
     
-    public ModifierMatchSimple(JFrame parent, String title, MatchSimple m, Connection conn){
+    public ModifierMatchSimple(Gestionnaire parent, String title, MatchSimple m, Connection conn){
         //On appelle le construteur de JDialog correspondant
         super(parent, title);
         this.parent = parent;
         match = m;
         this.connexion = conn;
-        this.setSize(600, 300);
+        this.setSize(700, 350);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.initComponent();
-    }
-    
-    
-    public MatchSimple afficheS(){
-        this.setVisible(true);      
-        return this.match;      
+        this.setVisible(true);  
     }
     
     private void initComponent(){
+        
         //Icône
-        /*
-        icon = new JLabel(new ImageIcon("images/icone.jpg"));
+        icon = new JLabel(new ImageIcon("images/simple.jpg"));
         JPanel panIcon = new JPanel();
-        panIcon.setBackground(Color.white);
         panIcon.setLayout(new BorderLayout());
-        panIcon.add(icon);*/
+        panIcon.add(icon);
 
         //Choix des Joueurs
         JPanel choixJoueurs = new JPanel();
@@ -165,7 +159,6 @@ public class ModifierMatchSimple extends JDialog{
 
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
-        content.setBackground(Color.white);
         content.add(choixJoueurs);
         content.add(choixTour);
         content.add(dateHeure);
@@ -205,6 +198,7 @@ public class ModifierMatchSimple extends JDialog{
                 }
                 
                 setVisible(false);
+                parent.updateApp();
             }
             
             public int getHeure() {
@@ -232,6 +226,7 @@ public class ModifierMatchSimple extends JDialog{
             }
             MatchSimple remove = MatchSimple.listeMatchSimple.remove(match.getIdMatch());
             setVisible(false);
+            parent.updateApp();
             JOptionPane.showMessageDialog(parent,
                 "Le match simple de "+remove.getRealTime()+" a bien été supprimé.",
                 "Suppresion réussie",
@@ -247,7 +242,7 @@ public class ModifierMatchSimple extends JDialog{
         control.add(deleteBouton);
         control.add(cancelBouton);
 
-        //this.getContentPane().add(panIcon, BorderLayout.WEST);
+        this.getContentPane().add(panIcon, BorderLayout.WEST);
         this.getContentPane().add(content, BorderLayout.CENTER);
         this.getContentPane().add(control, BorderLayout.SOUTH);
     }

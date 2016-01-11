@@ -5,6 +5,10 @@
  */
 package metiers;
 
+import java.awt.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  *
  * @author Ben
@@ -14,6 +18,8 @@ public abstract class Personne {
     private String nom;
     private String prenom;
     private String nationalite;
+    
+    private static final String[] LISTENAT = {"FRA","ESP","GBR","SRB","CAN","CZE","LAT"};
     
     public Personne(String nom, String prenom, String nationalite) {
         this.nom = nom;
@@ -27,4 +33,9 @@ public abstract class Personne {
     public void setNom(String nom) {this.nom = nom;}
     public void setPrenom(String prenom) {this.prenom = prenom;}
     public void setNationalite(String nationalite) {this.nationalite = nationalite;}
+
+    public static String[] getLISTENAT() {
+        return LISTENAT;
+    }
+    
 }

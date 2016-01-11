@@ -10,24 +10,25 @@ import java.sql.Connection;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import metiers.MatchDouble;
+import metiers.Joueur;
 
 /**
  *
  * @author Ben
  */
-public class JMatchDouble extends JButton {
+public class JJoueur extends JButton {
     
-    private final MatchDouble match;
+    private final Joueur joueur;
     
-    public JMatchDouble(Gestionnaire parent, MatchDouble m, Connection conn) {
-        match = m;
-        this.setText(match.getRealTime());
+    public JJoueur(Gestionnaire parent, Joueur j, Connection conn) {
+        joueur = j;
+        this.setText(joueur.prenomNom());
         this.addActionListener((ActionEvent ae) -> {
-            int option = JOptionPane.showConfirmDialog(parent, m.affiche(), "Info Match", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            int option = JOptionPane.showConfirmDialog(parent, j, "Info Joueur", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (option == JOptionPane.OK_OPTION) {
-                ModifierMatchDouble mms = new ModifierMatchDouble(parent,m.toString(),m,conn);
+                ModifierJoueur mj = new ModifierJoueur(parent,j.toString(),j,conn);
             }
         });
     }
+    
 }

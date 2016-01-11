@@ -9,17 +9,23 @@ import connexion.ConfigConnexion;
 import metiers.Joueur;
 import metiers.MatchSimple;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -60,6 +66,8 @@ public class Gestionnaire extends JFrame {
     private final JourPlanning samedi;
     
     private final ArrayList<JourPlanning> jours = new ArrayList();
+    private final ArrayList<JJoueur> joueurs = new ArrayList();
+    ArrayList<JComboBox> comboJ;
     
     final static String AJOUTERMATCH = "Ajouter un Match";
     final static String AJOUTERJOUEUR = "Ajouter un Joueur";
@@ -94,7 +102,7 @@ public class Gestionnaire extends JFrame {
     
     private void build() {
         this.setTitle("Gestionnaire Match");
-        this.setSize(900, 500);
+        this.setSize(900, 550);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -138,11 +146,33 @@ public class Gestionnaire extends JFrame {
         JLabel titre = new JLabel("Planning prévisionnel");
         enTete.add(titre);
         enTete.add(Box.createHorizontalGlue());
+        //Bouton Refresh au cas où les matchs sont modifiés ailleurs que sur l'application
         JButton update = new JButton("Refresh");
         update.addActionListener((ActionEvent ae) -> {
             updateApp();
         });
         enTete.add(update);
+        enTete.add(Box.createHorizontalGlue());
+        //Bouton pour générer un planning prévisionnel automatiquement en fonction du nombre de joueur
+        JButton generate = new JButton("Générer");
+        update.addActionListener((ActionEvent ae) -> {
+            generatePlanning();
+        });
+        enTete.add(generate);
+        enTete.add(Box.createHorizontalGlue());
+        //Bouton pour supprimer tous les matchs
+        JButton deleteAll = new JButton("Tout supprimer");
+        deleteAll.addActionListener((ActionEvent ae) -> {
+            int option = JOptionPane.showConfirmDialog(planning, "Êtes-vous sûr de vouloir supprimer tous les matchs ?", "Suppression des matchs", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (option == JOptionPane.OK_OPTION) {
+                String requete = "Delete From Match_Simple";
+                ConfigConnexion.executeRequete(CONNEXION, requete);
+                requete = "Delete From Match_Double";
+                ConfigConnexion.executeRequete(CONNEXION, requete);
+                updateApp();
+            }
+        });
+        enTete.add(deleteAll);
         planning.add(enTete, BorderLayout.NORTH);
         planning.add(scroll, BorderLayout.CENTER);
         planning.setSize(new Dimension(600,500));
@@ -165,6 +195,7 @@ public class Gestionnaire extends JFrame {
         radioButtons.setLayout(new BoxLayout(radioButtons, BoxLayout.PAGE_AXIS));
         JRadioButton matchSimple = new JRadioButton("Simple");
         matchSimple.setActionCommand("Simple");
+        //Quand on appuie sur le bouton simple, on affiche que deux champs de sélection de joueur
         matchSimple.addActionListener((ActionEvent ae) -> {
             simple.setVisible(true);
             doubl.setVisible(false);
@@ -172,6 +203,7 @@ public class Gestionnaire extends JFrame {
         matchSimple.setSelected(true);
         JRadioButton matchDouble = new JRadioButton("Double");
         matchDouble.setActionCommand("Double");
+        //Quand on appuie sur le bouton double, on affiche 4 champs de sélection de joueur
         matchDouble.addActionListener((ActionEvent ae) -> {
             doubl.setVisible(true);
             simple.setVisible(false);
@@ -196,25 +228,33 @@ public class Gestionnaire extends JFrame {
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             j1.addItem(j.prenomNom());
         });
-        j1.setMaximumSize(new Dimension(140,25));
+        j1.setMaximumSize(new Dimension(200,25));
         j1Pane.add(j1);
+        j1Pane.add(Box.createHorizontalGlue());
         simple.add(j1Pane);
         
-        simple.add(new JLabel("Versus"));
+        JPanel versus = new JPanel();
+        versus.setLayout(new BoxLayout(versus, BoxLayout.LINE_AXIS));
+        versus.add(Box.createHorizontalStrut(175));
+        versus.add(new JLabel("Versus"));
+        versus.add(Box.createHorizontalGlue());
+        simple.add(versus);
         
         //Sélection Joueur 2
         JPanel j2Pane = new JPanel();
         j2Pane.setLayout(new BoxLayout(j2Pane, BoxLayout.LINE_AXIS));
+        j2Pane.add(Box.createHorizontalGlue());
         j2Pane.add(new JLabel("Joueur 2 :"));
         j2Pane.add(Box.createHorizontalStrut(20));
         JComboBox j2 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             j2.addItem(j.prenomNom());
         });
-        j2.setMaximumSize(new Dimension(140,25));
+        j2.setMaximumSize(new Dimension(200,25));
         j2Pane.add(j2);
         simple.add(j2Pane);
         
+        simple.setBorder(BorderFactory.createTitledBorder("Choix des joueurs en simple"));
         ajoutMatch.add(simple);
         
         //DOUBLE
@@ -228,11 +268,17 @@ public class Gestionnaire extends JFrame {
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             a1.addItem(j.prenomNom());
         });
-        a1.setMaximumSize(new Dimension(140,25));
+        a1.setMaximumSize(new Dimension(200,25));
         a1Pane.add(a1);
+        a1Pane.add(Box.createHorizontalGlue());
         doubl.add(a1Pane);
         
-        doubl.add(new JLabel("Avec"));
+        JPanel avec1 = new JPanel();
+        avec1.setLayout(new BoxLayout(avec1, BoxLayout.LINE_AXIS));
+        avec1.add(Box.createHorizontalStrut(100));
+        avec1.add(new JLabel("Avec"));
+        avec1.add(Box.createHorizontalGlue());
+        doubl.add(avec1);
         
         //Sélection A2
         JPanel a2Pane = new JPanel();
@@ -243,46 +289,61 @@ public class Gestionnaire extends JFrame {
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             a2.addItem(j.prenomNom());
         });
-        a2.setMaximumSize(new Dimension(140,25));
+        a2.setMaximumSize(new Dimension(200,25));
         a2Pane.add(a2);
+        a2Pane.add(Box.createHorizontalGlue());
         doubl.add(a2Pane);
         
         doubl.add(Box.createVerticalGlue());
-        doubl.add(new JLabel("Versus"));
+        JPanel versus2 = new JPanel();
+        versus2.setLayout(new BoxLayout(versus2, BoxLayout.LINE_AXIS));
+        versus2.add(Box.createHorizontalStrut(175));
+        versus2.add(new JLabel("Versus"));
+        versus2.add(Box.createHorizontalGlue());
+        doubl.add(versus2);
         doubl.add(Box.createVerticalGlue());
         
         //Sélection B1
         JPanel b1Pane = new JPanel();
         b1Pane.setLayout(new BoxLayout(b1Pane, BoxLayout.LINE_AXIS));
+        b1Pane.add(Box.createHorizontalGlue());
         b1Pane.add(new JLabel("Joueur B1 :"));
         b1Pane.add(Box.createHorizontalStrut(20));
         JComboBox b1 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             b1.addItem(j.prenomNom());
         });
-        b1.setMaximumSize(new Dimension(140,25));
+        b1.setMaximumSize(new Dimension(200,25));
         b1Pane.add(b1);
         doubl.add(b1Pane);
         
-        doubl.add(new JLabel("Avec"));
+        JPanel avec2 = new JPanel();
+        avec2.setLayout(new BoxLayout(avec2, BoxLayout.LINE_AXIS));
+        avec2.add(Box.createHorizontalGlue());
+        avec2.add(new JLabel("Avec"));
+        avec2.add(Box.createHorizontalStrut(100));
+        doubl.add(avec2);
         
         //Sélection B2
         JPanel b2Pane = new JPanel();
         b2Pane.setLayout(new BoxLayout(b2Pane, BoxLayout.LINE_AXIS));
+        b2Pane.add(Box.createHorizontalGlue());
         b2Pane.add(new JLabel("Joueur B2 :"));
         b2Pane.add(Box.createHorizontalStrut(20));
         JComboBox b2 = new JComboBox();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
             b2.addItem(j.prenomNom());
         });
-        b2.setMaximumSize(new Dimension(140,25));
+        b2.setMaximumSize(new Dimension(200,25));
         b2Pane.add(b2);
         doubl.add(b2Pane);
         
         doubl.setVisible(false);
+        doubl.setBorder(BorderFactory.createTitledBorder("Choix des joueurs en double"));
+        ajoutMatch.add(doubl);
         
-        //Regroupement de tous les combobox dans un array
-        ArrayList<JComboBox> comboJ = new ArrayList();
+        //Regroupement de tous les combobox dans un array pour pouvoir les remettre à jour plus facilement
+        comboJ = new ArrayList();
         comboJ.add(j1);
         comboJ.add(j2);
         comboJ.add(a1);
@@ -290,14 +351,14 @@ public class Gestionnaire extends JFrame {
         comboJ.add(b1);
         comboJ.add(b2);
         
-        ajoutMatch.add(doubl);
-        
         ajoutMatch.add(Box.createVerticalGlue());
         
         //Choix du tour du match
-        JPanel tour = new JPanel(new FlowLayout());
+        JPanel tour = new JPanel();
+        tour.setLayout(new BoxLayout(tour,BoxLayout.LINE_AXIS));
+        tour.add(Box.createHorizontalStrut(50));
         tour.add(new JLabel("Tour"));
-        tour.add(Box.createHorizontalGlue());
+        tour.add(Box.createHorizontalStrut(20));
         JComboBox choixTour = new JComboBox();
         choixTour.addItem("Qualification");
         choixTour.addItem("1/32");
@@ -306,62 +367,105 @@ public class Gestionnaire extends JFrame {
         choixTour.addItem("Quart de finale");
         choixTour.addItem("Demi-finale");
         choixTour.addItem("Finale");
+        choixTour.setMaximumSize(new Dimension(200,25));
         tour.add(choixTour);
+        tour.add(Box.createHorizontalGlue());
         ajoutMatch.add(tour);
         
-        JPanel date = new JPanel(new FlowLayout());
-        date.add(new JLabel("Date (jj/mm/aa)"));
-        JTextField jour = new JTextField(8);
+        ajoutMatch.add(Box.createVerticalGlue());
+        
+        JPanel date = new JPanel();
+        date.setLayout(new BoxLayout(date,BoxLayout.LINE_AXIS));
+        date.add(Box.createHorizontalStrut(50));
+        date.add(new JLabel("Date"));
+        date.add(Box.createHorizontalStrut(20));
+        JComboBox jour = new JComboBox();
+        jour.addItem("31/01/16");
+        jour.addItem("01/02/16");
+        jour.addItem("02/02/16");
+        jour.addItem("03/02/16");
+        jour.addItem("04/02/16");
+        jour.addItem("05/02/16");
+        jour.addItem("06/02/16");
+        jour.setMaximumSize(new Dimension(200,25));
         date.add(jour);
+        date.add(Box.createHorizontalGlue());
         ajoutMatch.add(date);
         
-        JPanel crenau = new JPanel(new FlowLayout());
+        ajoutMatch.add(Box.createVerticalGlue());
+        
+        JPanel crenau = new JPanel();
+        crenau.setLayout(new BoxLayout(crenau,BoxLayout.LINE_AXIS));
+        crenau.add(Box.createHorizontalStrut(50));
         crenau.add(new JLabel("Heure (crénau)"));
+        crenau.add(Box.createHorizontalStrut(20));
+        JRadioButton h1 = new JRadioButton("8h");
+        h1.setSelected(true);
+        JRadioButton h2 = new JRadioButton("11h");
+        JRadioButton h3 = new JRadioButton("15h");
+        JRadioButton h4 = new JRadioButton("18h");
+        JRadioButton h5 = new JRadioButton("21h");
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(h1);
+        bg.add(h2);
+        bg.add(h3);
+        bg.add(h4);
+        bg.add(h5);
+        crenau.add(h1);
+        crenau.add(h2);
+        crenau.add(h3);
+        crenau.add(h4);
+        crenau.add(h5);
         crenau.add(Box.createHorizontalGlue());
-        JComboBox heure = new JComboBox();
-        heure.addItem("matin (8h)");
-        heure.addItem("matinée (11h)");
-        heure.addItem("midi (15h)");
-        heure.addItem("après-midi (18h)");
-        heure.addItem("soirée (21h)");
-        crenau.add(heure);
         ajoutMatch.add(crenau);
         ajoutMatch.add(Box.createVerticalGlue());
         
         JButton valider = new JButton("Ajouter");
-        valider.addActionListener((ActionEvent ae) -> {
-            System.out.print("Ajout Match ");
-            if (group.getSelection().getActionCommand().equals("Simple")) {
-                System.out.println("Simple");
-                MatchSimple m = new MatchSimple(jour.getText(),heure.getSelectedIndex(),choixTour.getSelectedItem().toString(),
-                        Joueur.getListeJoueurs().get(j1.getSelectedIndex()+1),
-                        Joueur.getListeJoueurs().get(j2.getSelectedIndex()+1));
-                try {
-                    m.ajouterMatchSimple(CONNEXION);
-                } catch (SQLIntegrityConstraintViolationException ex) {
-                    JOptionPane.showMessageDialog(tabGestion,
-                    "Il existe déjà un match au même moment",
-                    "SQLIntegrityConstraintViolationException",
-                    JOptionPane.ERROR_MESSAGE);
+        valider.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                System.out.print("Ajout Match ");
+                if (group.getSelection().getActionCommand().equals("Simple")) {
+                    System.out.println("Simple");
+                    MatchSimple m = new MatchSimple(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
+                            Joueur.getListeJoueurs().get(j1.getSelectedIndex()+1),
+                            Joueur.getListeJoueurs().get(j2.getSelectedIndex()+1));
+                    try {
+                        m.ajouterMatchSimple(CONNEXION);
+                    } catch (SQLIntegrityConstraintViolationException ex) {
+                        JOptionPane.showMessageDialog(tabGestion,
+                                "Il existe déjà un match au même moment",
+                                "SQLIntegrityConstraintViolationException",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 }
-            }
-            else if(group.getSelection().getActionCommand().equals("Double")) {
-                System.out.println("Double");
-                MatchDouble m = new MatchDouble(jour.getText(),heure.getSelectedIndex(),choixTour.getSelectedItem().toString(),
-                        Joueur.getListeJoueurs().get(a1.getSelectedIndex()+1),
-                        Joueur.getListeJoueurs().get(a2.getSelectedIndex()+1),
-                        Joueur.getListeJoueurs().get(b1.getSelectedIndex()+1),
-                        Joueur.getListeJoueurs().get(b2.getSelectedIndex()+1));
-                try {
-                    m.ajouterMatchDouble(CONNEXION);
-                } catch (SQLIntegrityConstraintViolationException ex) {
-                    JOptionPane.showMessageDialog(tabGestion,
-                    "Il existe déjà un match au même moment",
-                    "SQLIntegrityConstraintViolationException",
-                    JOptionPane.ERROR_MESSAGE);
+                else if(group.getSelection().getActionCommand().equals("Double")) {
+                    System.out.println("Double");
+                    MatchDouble m = new MatchDouble(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
+                            Joueur.getListeJoueurs().get(a1.getSelectedIndex()+1),
+                            Joueur.getListeJoueurs().get(a2.getSelectedIndex()+1),
+                            Joueur.getListeJoueurs().get(b1.getSelectedIndex()+1),
+                            Joueur.getListeJoueurs().get(b2.getSelectedIndex()+1));
+                    try {
+                        m.ajouterMatchDouble(CONNEXION);
+                    } catch (SQLIntegrityConstraintViolationException ex) {
+                        JOptionPane.showMessageDialog(tabGestion,
+                                "Il existe déjà un match au même moment",
+                                "SQLIntegrityConstraintViolationException",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 }
+                updateApp();
             }
-            updateApp();
+            
+            public int getHeure() {
+                return (h1.isSelected()) ? 0 :
+                        (h2.isSelected()) ? 1 :
+                        (h3.isSelected()) ? 2 :
+                        (h4.isSelected()) ? 3 :
+                        (h5.isSelected()) ? 4 :
+                        0;
+            }
         });
         ajoutMatch.add(valider);
         //Fin onglet Ajout Match
@@ -381,14 +485,7 @@ public class Gestionnaire extends JFrame {
         prenom.add(textPrenom);
         JPanel nationalite = new JPanel(new FlowLayout());
         JLabel labelNationalite = new JLabel("Nationalité ");
-        JComboBox comboNationalite = new JComboBox();
-        comboNationalite.addItem("FRA");
-        comboNationalite.addItem("ESP");
-        comboNationalite.addItem("GBR");
-        comboNationalite.addItem("SRB");
-        comboNationalite.addItem("CAN");
-        comboNationalite.addItem("CZE");
-        comboNationalite.addItem("LAT");
+        JComboBox comboNationalite = new JComboBox(Joueur.getLISTENAT());
         nationalite.add(labelNationalite);
         nationalite.add(comboNationalite);
         JButton submit = new JButton("Valider");
@@ -404,9 +501,7 @@ public class Gestionnaire extends JFrame {
             }
             Joueur.getListeJoueurs().put(nouvJ.getIdJoueur(),nouvJ);//On ajoute le joueur à la liste de tous les joueurs
             updatePanelJoueur();//On remet à jour le conteneur de la liste des joueurs
-            comboJ.stream().forEach((jc) -> {
-                jc.addItem(nouvJ.getPrenom()+" "+nouvJ.getNom());//On ajoute le nouveau joueurs sur chaque combo box
-            });
+            
             textNom.setText("");
             textPrenom.setText("");
         });
@@ -433,14 +528,25 @@ public class Gestionnaire extends JFrame {
         jours.stream().forEach((j) -> {
             j.updateJour();
         });
-        this.revalidate();// Remet à jour les boutons des matchs
+        this.repaint();// Redessine les boutons avec leurs nouveaux intitulés
+        this.revalidate();// Remet à jour les boutons des matchs en les affichant
     }
     
     public void updatePanelJoueur() {
+        System.out.println("\tUpdate liste Joueurs");
         listeJoueur.removeAll();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            listeJoueur.add(new JLabel(j.toString()));
+            listeJoueur.add(new JJoueur(this,j,CONNEXION),BorderLayout.CENTER);
+            comboJ.stream().forEach((jc) -> {
+            jc.addItem(j.getPrenom()+" "+j.getNom());//On ajoute le nouveau joueurs sur chaque combo box
         });
+        });
+        this.repaint();
+        this.revalidate();
+    }
+    
+    private void generatePlanning() {
+        
     }
     
     public static void main(String[] args) {

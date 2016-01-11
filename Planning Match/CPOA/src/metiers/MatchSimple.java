@@ -128,7 +128,7 @@ public class MatchSimple extends Match {
         System.out.println("Remise à jour de la liste des matchs en simple.");
         listeMatchSimple.clear();
         try {
-            ResultSet rset = ConfigConnexion.executeRequete(conn,"select idmatch, date_match, heure_match, tour_match, idj1, idj2 from MATCH_SIMPLE order by heure_match");
+            ResultSet rset = ConfigConnexion.executeRequete(conn,"select idmatch, date_match, heure_match, tour_match, idj1, idj2 from MATCH_SIMPLE ");
             while (rset.next()) {
                 listeMatchSimple.put(rset.getInt(1), new MatchSimple(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4), rset.getInt(5),rset.getInt(6)));
             }
