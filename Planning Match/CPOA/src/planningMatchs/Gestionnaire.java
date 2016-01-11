@@ -9,7 +9,6 @@ import connexion.ConfigConnexion;
 import metiers.Joueur;
 import metiers.MatchSimple;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -17,11 +16,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import metiers.Match;
 import metiers.MatchDouble;
 
 /**
@@ -146,16 +143,9 @@ public class Gestionnaire extends JFrame {
         JLabel titre = new JLabel("Planning prévisionnel");
         enTete.add(titre);
         enTete.add(Box.createHorizontalGlue());
-        //Bouton Refresh au cas où les matchs sont modifiés ailleurs que sur l'application
-        JButton update = new JButton("Refresh");
-        update.addActionListener((ActionEvent ae) -> {
-            updateApp();
-        });
-        enTete.add(update);
-        enTete.add(Box.createHorizontalGlue());
         //Bouton pour générer un planning prévisionnel automatiquement en fonction du nombre de joueur
         JButton generate = new JButton("Générer");
-        update.addActionListener((ActionEvent ae) -> {
+        generate.addActionListener((ActionEvent ae) -> {
             generatePlanning();
         });
         enTete.add(generate);
@@ -173,6 +163,13 @@ public class Gestionnaire extends JFrame {
             }
         });
         enTete.add(deleteAll);
+        enTete.add(Box.createHorizontalGlue());
+        //Bouton Refresh au cas où les matchs sont modifiés ailleurs que sur l'application
+        JButton update = new JButton("Refresh");
+        update.addActionListener((ActionEvent ae) -> {
+            updateApp();
+        });
+        enTete.add(update);
         planning.add(enTete, BorderLayout.NORTH);
         planning.add(scroll, BorderLayout.CENTER);
         planning.setSize(new Dimension(600,500));
@@ -183,7 +180,7 @@ public class Gestionnaire extends JFrame {
         JPanel simple = new JPanel();
         JPanel doubl = new JPanel();
         
-        //Onglet Ajout Match
+        // ---------------------- Onglet Ajout Match -------------------------------
         JPanel ajoutMatch = new JPanel();
         ajoutMatch.setLayout(new BoxLayout(ajoutMatch, BoxLayout.PAGE_AXIS));
         ajoutMatch.add(Box.createVerticalGlue());
@@ -225,9 +222,6 @@ public class Gestionnaire extends JFrame {
         j1Pane.add(new JLabel("Joueur 1 :"));
         j1Pane.add(Box.createHorizontalStrut(20));
         JComboBox j1 = new JComboBox();
-        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            j1.addItem(j.prenomNom());
-        });
         j1.setMaximumSize(new Dimension(200,25));
         j1Pane.add(j1);
         j1Pane.add(Box.createHorizontalGlue());
@@ -247,9 +241,6 @@ public class Gestionnaire extends JFrame {
         j2Pane.add(new JLabel("Joueur 2 :"));
         j2Pane.add(Box.createHorizontalStrut(20));
         JComboBox j2 = new JComboBox();
-        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            j2.addItem(j.prenomNom());
-        });
         j2.setMaximumSize(new Dimension(200,25));
         j2Pane.add(j2);
         simple.add(j2Pane);
@@ -265,9 +256,6 @@ public class Gestionnaire extends JFrame {
         a1Pane.add(new JLabel("Joueur A1 :"));
         a1Pane.add(Box.createHorizontalStrut(20));
         JComboBox a1 = new JComboBox();
-        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            a1.addItem(j.prenomNom());
-        });
         a1.setMaximumSize(new Dimension(200,25));
         a1Pane.add(a1);
         a1Pane.add(Box.createHorizontalGlue());
@@ -286,9 +274,6 @@ public class Gestionnaire extends JFrame {
         a2Pane.add(new JLabel("Joueur A2 :"));
         a2Pane.add(Box.createHorizontalStrut(20));
         JComboBox a2 = new JComboBox();
-        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            a2.addItem(j.prenomNom());
-        });
         a2.setMaximumSize(new Dimension(200,25));
         a2Pane.add(a2);
         a2Pane.add(Box.createHorizontalGlue());
@@ -310,9 +295,6 @@ public class Gestionnaire extends JFrame {
         b1Pane.add(new JLabel("Joueur B1 :"));
         b1Pane.add(Box.createHorizontalStrut(20));
         JComboBox b1 = new JComboBox();
-        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            b1.addItem(j.prenomNom());
-        });
         b1.setMaximumSize(new Dimension(200,25));
         b1Pane.add(b1);
         doubl.add(b1Pane);
@@ -331,9 +313,6 @@ public class Gestionnaire extends JFrame {
         b2Pane.add(new JLabel("Joueur B2 :"));
         b2Pane.add(Box.createHorizontalStrut(20));
         JComboBox b2 = new JComboBox();
-        Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            b2.addItem(j.prenomNom());
-        });
         b2.setMaximumSize(new Dimension(200,25));
         b2Pane.add(b2);
         doubl.add(b2Pane);
@@ -424,38 +403,67 @@ public class Gestionnaire extends JFrame {
         valider.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                System.out.print("Ajout Match ");
                 if (group.getSelection().getActionCommand().equals("Simple")) {
-                    System.out.println("Simple");
-                    MatchSimple m = new MatchSimple(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
-                            Joueur.getListeJoueurs().get(j1.getSelectedIndex()+1),
-                            Joueur.getListeJoueurs().get(j2.getSelectedIndex()+1));
+                    Joueur joueur1 = Joueur.getListeJoueurs().get(j1.getSelectedIndex()+1);
+                    Joueur joueur2 = Joueur.getListeJoueurs().get(j2.getSelectedIndex()+1);
                     try {
+                        // Vérification qu'un joueur ne joue pas contre lui même
+                        if (joueur1.equals(joueur2)) {
+                            throw new DoublonJoueurException("Erreur");
+                        }
+                        MatchSimple m = new MatchSimple(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
+                                joueur1,
+                                joueur2);
                         m.ajouterMatchSimple(CONNEXION);
+                        updateApp();
                     } catch (SQLIntegrityConstraintViolationException ex) {
                         JOptionPane.showMessageDialog(tabGestion,
                                 "Il existe déjà un match au même moment",
                                 "SQLIntegrityConstraintViolationException",
+                                JOptionPane.ERROR_MESSAGE);
+                    }catch (DoublonJoueurException ex) {
+                        JOptionPane.showMessageDialog(tabGestion,
+                                Joueur.getListeJoueurs().get(j1.getSelectedIndex()+1).prenomNom()+" ne peut pas jouer contre lui-même !",
+                                "Erreur Sélection des joueurs",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 else if(group.getSelection().getActionCommand().equals("Double")) {
-                    System.out.println("Double");
-                    MatchDouble m = new MatchDouble(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
-                            Joueur.getListeJoueurs().get(a1.getSelectedIndex()+1),
-                            Joueur.getListeJoueurs().get(a2.getSelectedIndex()+1),
-                            Joueur.getListeJoueurs().get(b1.getSelectedIndex()+1),
-                            Joueur.getListeJoueurs().get(b2.getSelectedIndex()+1));
+                    Joueur joueur1 = Joueur.getListeJoueurs().get(a1.getSelectedIndex()+1);
+                    Joueur joueur2 = Joueur.getListeJoueurs().get(a2.getSelectedIndex()+1);
+                    Joueur joueur3 = Joueur.getListeJoueurs().get(b1.getSelectedIndex()+1);
+                    Joueur joueur4 = Joueur.getListeJoueurs().get(b2.getSelectedIndex()+1);
                     try {
+                        //Vérification des contraintes
+                        if (joueur1.equals(joueur2) || joueur3.equals(joueur4)) {
+                            throw new DoublonJoueurException(joueur1.prenomNom()+" ne peut pas jouer deux fois dans la même équipe !");
+                        }
+                        if (joueur1.equals(joueur3) || joueur1.equals(joueur4)) {
+                            throw new DoublonJoueurException(joueur1.prenomNom()+" ne peut pas jouer dans deux équipes à la fois !");
+                        }
+                        if (joueur2.equals(joueur3) || joueur1.equals(joueur4)) {
+                            throw new DoublonJoueurException(joueur2.prenomNom()+" ne peut pas jouer dans deux équipes à la fois !");
+                        }
+                        
+                        MatchDouble m = new MatchDouble(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
+                            joueur1,
+                            joueur2,
+                            joueur3,
+                            joueur4);
                         m.ajouterMatchDouble(CONNEXION);
+                        updateApp();
                     } catch (SQLIntegrityConstraintViolationException ex) {
                         JOptionPane.showMessageDialog(tabGestion,
                                 "Il existe déjà un match au même moment",
                                 "SQLIntegrityConstraintViolationException",
                                 JOptionPane.ERROR_MESSAGE);
+                    } catch (DoublonJoueurException ex) {
+                        JOptionPane.showMessageDialog(tabGestion,
+                                ex.getMessage(),
+                                "Erreur Sélection des joueurs",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
-                updateApp();
             }
             
             public int getHeure() {
@@ -470,7 +478,7 @@ public class Gestionnaire extends JFrame {
         ajoutMatch.add(valider);
         //Fin onglet Ajout Match
         
-        //Onglet Ajout Joueur
+        // ----------------------------------- Onglet Ajout Joueur ----------------------------------------
         JPanel ajoutJoueur = new JPanel();
         ajoutJoueur.setLayout(new BoxLayout(ajoutJoueur, BoxLayout.PAGE_AXIS));
         JPanel nom = new JPanel(new FlowLayout());
@@ -511,8 +519,9 @@ public class Gestionnaire extends JFrame {
         ajoutJoueur.add(submit);
         //Fin onglet Ajout Joueur
         
-        //Onglet Liste Joueur
+        // ------------------------------------------ Onglet Liste Joueur ----------------------------------------
         listeJoueur.setLayout(new BoxLayout(listeJoueur, BoxLayout.PAGE_AXIS));
+        listeJoueur.setAlignmentY(CENTER_ALIGNMENT);
         updatePanelJoueur();
         
         //Ajout des onglets au Panel tabGestion
@@ -521,6 +530,9 @@ public class Gestionnaire extends JFrame {
         tabGestion.addTab(LISTEJOUEUR, listeJoueur);
     }
     
+    /**
+     * Remise à jour de l'application, en particulier du planning des matchs
+     */
     public void updateApp() {
         System.out.println("\tUpdate Planning");
         MatchSimple.updateListMatchSimple(CONNEXION);
@@ -532,21 +544,46 @@ public class Gestionnaire extends JFrame {
         this.revalidate();// Remet à jour les boutons des matchs en les affichant
     }
     
+    /**
+     * Remise à jour de la liste des joueurs ainsi que tous les composants
+     * les utilisant.
+     */
     public void updatePanelJoueur() {
         System.out.println("\tUpdate liste Joueurs");
         listeJoueur.removeAll();
         Joueur.getListeJoueurs().values().stream().forEach((j) -> {
-            listeJoueur.add(new JJoueur(this,j,CONNEXION),BorderLayout.CENTER);
+            listeJoueur.add(new JJoueur(this,j,CONNEXION));
             comboJ.stream().forEach((jc) -> {
-            jc.addItem(j.getPrenom()+" "+j.getNom());//On ajoute le nouveau joueurs sur chaque combo box
-        });
+                jc.addItem(j.getPrenom()+" "+j.getNom());//On ajoute le joueur sur chaque combo box
+            });
         });
         this.repaint();
         this.revalidate();
     }
     
+    /**
+     * Génération d'un planning prévisionnel à partir des joueurs présents sur la base de donnée
+     */
     private void generatePlanning() {
-        
+        int i = 0;
+        MatchSimple m;
+        while (i<Joueur.listeJoueurs.size()) {
+            if (i <= 10) {
+                m = new MatchSimple("31/01/16",(i/2)%5,"Qualification",Joueur.listeJoueurs.get(i+1),Joueur.listeJoueurs.get(i+2));
+            } else {
+                m = new MatchSimple("01/02/16",(i/2)%5,"Qualification",Joueur.listeJoueurs.get(i+1),Joueur.listeJoueurs.get(i+2));
+            }
+                try {
+                m.ajouterMatchSimple(CONNEXION);
+            } catch (SQLIntegrityConstraintViolationException ex) {
+                JOptionPane.showMessageDialog(planning,
+                m+"\n\nCe match existe déjà.",
+                "Erreur de contrainte d'intégrité",
+                JOptionPane.ERROR_MESSAGE);
+            }
+            i+=2;
+        }
+        updateApp();
     }
     
     public static void main(String[] args) {

@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public abstract class Match {
     
-    private static int lastId = getLastId();
+    private static int lastId = getLastId(true);
     
     private int idMatch;
     private String date;
@@ -40,17 +40,18 @@ public abstract class Match {
         this.tour = tour;
     }
     
-    public static int getLastId() {
-        System.out.println("Obtenir le dernier id des matchs :");
+    public static int getLastId(boolean update) {System.out.println("Obtenir le dernier id des matchs :");
         int maxId = -1; //pour gérer l'erreur
-        try (Connection conn = ConfigConnexion.getConnection("connexion.properties")) {
-            ResultSet rset = ConfigConnexion.executeRequete(conn,"SELECT MAX(idmatch) FROM (SELECT idmatch FROM match_simple UNION ALL SELECT idmatch FROM match_double)");
-            rset.next();
-            maxId = rset.getInt(1);
-        } catch  (IOException | ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
+        if (update) {
+            try (Connection conn = ConfigConnexion.getConnection("connexion.properties")) {
+                ResultSet rset = ConfigConnexion.executeRequete(conn,"SELECT MAX(idmatch) FROM (SELECT idmatch FROM match_simple UNION ALL SELECT idmatch FROM match_double)");
+                rset.next();
+                maxId = rset.getInt(1);
+            } catch  (IOException | ClassNotFoundException | SQLException ex) {
+                Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            System.out.println("Dernier id : "+maxId);
         }
-        System.out.println("Dernier id : "+maxId);
         return maxId;
     }
     

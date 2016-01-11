@@ -50,7 +50,7 @@ class ModifierJoueur extends JDialog {
         this.setSize(400, 250);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
         this.initComponent();
         this.setVisible(true); 
     }
@@ -119,18 +119,23 @@ class ModifierJoueur extends JDialog {
                 prepared.setInt(1,j.getIdJoueur());
                 int result = prepared.executeUpdate();
                 System.out.println(result + " ligne(s) modifiée(s)");
+                Joueur remove = Joueur.listeJoueurs.remove(j.getIdJoueur());
+                parent.updatePanelJoueur();
+                JOptionPane.showMessageDialog(parent,
+                    "Le joueur"+remove.prenomNom()+" a bien été supprimé.",
+                    "Suppresion réussie",
+                    JOptionPane.INFORMATION_MESSAGE);
             } catch (SQLSyntaxErrorException ex) {
                 Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLIntegrityConstraintViolationException ex) {
+                JOptionPane.showMessageDialog(parent,
+                    "Impossible de supprimer "+j.prenomNom()+".\n\nVeuillez supprimer les matchs auxquels il participe.",
+                    "Erreur de contrainte d'intégrité",
+                    JOptionPane.ERROR_MESSAGE);
             } catch (SQLException ex) {
                 Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Joueur remove = Joueur.listeJoueurs.remove(j.getIdJoueur());
             setVisible(false);
-            parent.updatePanelJoueur();
-            JOptionPane.showMessageDialog(parent,
-                "Le joueur"+remove.prenomNom()+" a bien été supprimé.",
-                "Suppresion réussie",
-                JOptionPane.INFORMATION_MESSAGE);
         });
         
         JButton cancelBouton = new JButton("Annuler");

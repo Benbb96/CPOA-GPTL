@@ -55,7 +55,7 @@ public class ModifierMatchDouble extends JDialog{
         this.setSize(700, 400);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
         this.initComponent();
         this.setVisible(true); 
     }
