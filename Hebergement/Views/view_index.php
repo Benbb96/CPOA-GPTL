@@ -28,7 +28,7 @@
             </section>
         </section>
 		<div id="ucbl">
-			<img src="Web//IMG/ucbl.png" width="200" >
+			<img src="Web/IMG/ucbl.png" width="200" >
 		</div>
     </body>
 </html>

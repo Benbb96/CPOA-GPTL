@@ -1,12 +1,4 @@
 <div id="menu">
-
-    <ul>
-    	<li id="onglet_infos">Infos Personnelles</li><!--@whitespace
-     --><li id="onglet_defis">Mes défis</li><!--@whitespace
-     --><li id="onglet_progression">Ma Progression</li><!--@whitespace
- --></ul>
-
-
 </div>
 
 <section id="container">

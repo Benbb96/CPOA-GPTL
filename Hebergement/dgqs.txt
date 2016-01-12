@@ -1,0 +1,14 @@
+
+ $query=$bdd->prepare('INSERT INTO joueurs
+					   (nomJoueur,prenomJoueur,classementJoueur)
+					   VALUES(?,?,?)'
+					   );
+$query->execute(array($_POST['nomJoueur'],$_POST['prenomJoueur'],$_POST['classementJoueur']));
+
+
+
+$reponse=$bdd->query('SELECT nom,possesseur FROM jeux_video WHERE possesseur='.$var);
+
+$query=$bdd->prepare('UPDATE hotel_joueurs set nbr_lits_dispo = nbr_lits_dispo -' $_POST['nbr_lits']' where nom = '$_POST['hotel']);
+
+$query->execute();

@@ -34,8 +34,8 @@
         <nav>
             <ul>
                 <li link="accueil.php">Accueil</li>
-				<li link="espace_perso.php">Carte des Hôtels</li>
-				<li link="forum.php">Mon Espace Perso</li>
+				<li link="carte_hotel.php">Carte des Hôtels</li>
+				<li link="espace_perso.php">Mon Espace Perso</li>
             </ul>
         </nav>
     </header>

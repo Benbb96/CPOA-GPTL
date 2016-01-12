@@ -1,0 +1,50 @@
+@font-face {
+    font-family: "J.M.Nexus-Black";
+    src: url("../Web/FONT/J.M.Nexus-Black.ttf");
+}
+
+.bouton :hover{
+	background: #ededed;
+    color: #000;
+}
+
+#formulaire{
+	width : 300px;
+	margin : 10px auto;
+}
+#hotel1{
+	float:left;
+}
+#hotel2{
+	float : right;
+}
+#hotel3{
+	bottom:0;
+	
+}
+#hotel4{
+	float:right;
+	display: inline-block;
+	margin-bottom: 100px;
+	
+}
+#hotel5{
+	width : 300px;
+	margin : 10px auto;
+	
+}
+#hotel6{
+	float:left;
+}
+#hotel7{
+	float : right;
+}
+#hotel8{
+	bottom:0;
+}
+
+#joueurs{
+	float : right;
+}
+#arbitres{
+}
