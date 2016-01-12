@@ -5,10 +5,6 @@
  */
 package metiers;
 
-import java.awt.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 /**
  *
  * @author Ben
@@ -19,12 +15,13 @@ public abstract class Personne {
     private String prenom;
     private String nationalite;
     
-    private static final String[] LISTENAT = {"FRA","ESP","GBR","SRB","CAN","CZE","LAT"};
+    private static final String[] LISTENAT = new String[100];
     
     public Personne(String nom, String prenom, String nationalite) {
         this.nom = nom;
         this.prenom = prenom;
         this.nationalite = nationalite;
+        if (!NatContains(nationalite)) addNationalite(nationalite);
     }
     
     public String getNom() {return nom;}
@@ -36,6 +33,24 @@ public abstract class Personne {
 
     public static String[] getLISTENAT() {
         return LISTENAT;
+    }
+    
+    public static void addNationalite(String nat) {
+        int i = 0;
+        for (String n : LISTENAT) {
+            if (n == null) {
+                LISTENAT[i] = nat;
+                break;
+            }
+            i++;
+        }
+    }
+    
+    public static boolean NatContains(String nat) {
+        for (String n : LISTENAT) {
+            if (n != null && n.equals(nat)) return true; 
+        }
+        return false;
     }
     
 }

@@ -10,9 +10,7 @@ package planningMatchs;
  * @author Ben
  */
 class DoublonJoueurException extends Exception {
-
     public DoublonJoueurException(String msg) {
         super(msg);
     }
-    
 }

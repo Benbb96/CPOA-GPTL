@@ -8,7 +8,6 @@ package planningMatchs;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import metiers.Joueur;
 

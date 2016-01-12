@@ -22,7 +22,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -54,7 +53,7 @@ public class ModifierMatchSimple extends JDialog{
         this.setSize(700, 350);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         this.initComponent();
         this.setVisible(true);  
     }
@@ -89,7 +88,6 @@ public class ModifierMatchSimple extends JDialog{
         choixTour.setBorder(BorderFactory.createTitledBorder("Choix du tour"));
         tour = new JComboBox();
         tour.addItem("Qualification");
-        tour.addItem("1/32");
         tour.addItem("1/16");
         tour.addItem("1/8");
         tour.addItem("Quart de finale");

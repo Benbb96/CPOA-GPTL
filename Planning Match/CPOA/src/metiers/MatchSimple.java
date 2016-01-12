@@ -41,18 +41,6 @@ public class MatchSimple extends Match {
         this.j2 = j2;
     }
     
-    public MatchSimple(String date, int heure, String tour, int j1, int j2) {
-        super(date, heure, tour);
-        this.j1 = Joueur.listeJoueurs.get(j1);
-        this.j2 = Joueur.listeJoueurs.get(j2);
-    }
-    
-    public MatchSimple(int idMatch, String date, int heure, String tour, int j1, int j2) {
-        super(idMatch, date, heure, tour);
-        this.j1 = Joueur.listeJoueurs.get(j1);
-        this.j2 = Joueur.listeJoueurs.get(j2);
-    }
-    
     public Joueur getJ1() {return j1;}
     public Joueur getJ2() {return j2;}
     public int getVainqueur() {return vainqueur;}
@@ -67,36 +55,6 @@ public class MatchSimple extends Match {
     
     public String affiche() {
         return "Match Simple - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\n\n"+j1.prenomNom()+" Contre "+j2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
-    }
-    
-    /**
-     * Obtenir un match en fonction de son id
-     * @param idMatch
-     * @param conn Une connexion à la base
-     * @return le match correspond à l'id passé en paramètre
-     */
-    public static MatchSimple getMatch(int idMatch, Connection conn) {
-        MatchSimple match = null;
-        try {
-            ResultSet rset = ConfigConnexion.executeRequete(conn,"select date_match, heure_match, tour_match, idj1, idj2 from Match_Simple where idMatch="+idMatch);
-            if(rset.next()) {
-                match = new MatchSimple(idMatch, rset.getString(1), rset.getInt(2), rset.getString(3), rset.getInt(4), rset.getInt(5));
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return match;
-    }
-    
-    public static MatchSimple getMatch(String date, int heure, Connection conn) {
-        MatchSimple match = null;
-        try {
-            ResultSet rset = ConfigConnexion.executeRequete(conn, "select id_match, idj1, idj2, tour_match from Match_Simple where date_match="+date+" and heure_match="+heure);
-            match = new MatchSimple(rset.getInt(1), date, heure, rset.getString(4), rset.getInt(2), rset.getInt(3));
-        } catch (SQLException ex) {
-            Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return match;
     }
     
     public void ajouterMatchSimple(Connection conn) throws SQLIntegrityConstraintViolationException {
@@ -130,7 +88,9 @@ public class MatchSimple extends Match {
         try {
             ResultSet rset = ConfigConnexion.executeRequete(conn,"select idmatch, date_match, heure_match, tour_match, idj1, idj2 from MATCH_SIMPLE ");
             while (rset.next()) {
-                listeMatchSimple.put(rset.getInt(1), new MatchSimple(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4), rset.getInt(5),rset.getInt(6)));
+                Joueur j1 = Joueur.listeJoueurs.get(rset.getInt(5));
+                Joueur j2 = Joueur.listeJoueurs.get(rset.getInt(6));
+                listeMatchSimple.put(rset.getInt(1), new MatchSimple(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4),j1,j2));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);

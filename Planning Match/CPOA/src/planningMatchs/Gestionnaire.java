@@ -36,7 +36,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import metiers.Match;
 import metiers.MatchDouble;
 
 /**
@@ -340,7 +339,6 @@ public class Gestionnaire extends JFrame {
         tour.add(Box.createHorizontalStrut(20));
         JComboBox choixTour = new JComboBox();
         choixTour.addItem("Qualification");
-        choixTour.addItem("1/32");
         choixTour.addItem("1/16");
         choixTour.addItem("1/8");
         choixTour.addItem("Quart de finale");
@@ -441,7 +439,7 @@ public class Gestionnaire extends JFrame {
                         if (joueur1.equals(joueur3) || joueur1.equals(joueur4)) {
                             throw new DoublonJoueurException(joueur1.prenomNom()+" ne peut pas jouer dans deux équipes à la fois !");
                         }
-                        if (joueur2.equals(joueur3) || joueur1.equals(joueur4)) {
+                        if (joueur2.equals(joueur3) || joueur2.equals(joueur4)) {
                             throw new DoublonJoueurException(joueur2.prenomNom()+" ne peut pas jouer dans deux équipes à la fois !");
                         }
                         
@@ -520,14 +518,14 @@ public class Gestionnaire extends JFrame {
         //Fin onglet Ajout Joueur
         
         // ------------------------------------------ Onglet Liste Joueur ----------------------------------------
-        listeJoueur.setLayout(new BoxLayout(listeJoueur, BoxLayout.PAGE_AXIS));
-        listeJoueur.setAlignmentY(CENTER_ALIGNMENT);
+        listeJoueur.setLayout(new GridLayout(40,3,4,3));
+        JScrollPane scroll = new JScrollPane(listeJoueur);
         updatePanelJoueur();
         
         //Ajout des onglets au Panel tabGestion
         tabGestion.addTab(AJOUTERMATCH, ajoutMatch);
         tabGestion.addTab(AJOUTERJOUEUR, ajoutJoueur);
-        tabGestion.addTab(LISTEJOUEUR, listeJoueur);
+        tabGestion.addTab(LISTEJOUEUR, scroll);
     }
     
     /**

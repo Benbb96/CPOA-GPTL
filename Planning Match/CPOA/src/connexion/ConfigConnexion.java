@@ -31,9 +31,7 @@ public class ConfigConnexion {
       throws IOException, ClassNotFoundException, SQLException {
     Properties props = new Properties();
     URL urlFichierProp = ConfigConnexion.class.getResource(nomFichierProp);
-    BufferedInputStream bis = null;
-    try {
-        bis = new BufferedInputStream(urlFichierProp.openStream());
+    try (BufferedInputStream bis = new BufferedInputStream(urlFichierProp.openStream())) {
         props.load(bis);
         String driver = props.getProperty("driver");
         String url = props.getProperty("url");
@@ -41,11 +39,6 @@ public class ConfigConnexion {
         String mdp = props.getProperty("mdp");
         Class.forName(driver);
         return DriverManager.getConnection(url, utilisateur, mdp);
-    }
-    finally {
-      if (bis != null) {
-        bis.close();
-      }
     }
   }
 
@@ -70,19 +63,12 @@ public class ConfigConnexion {
     public static Connection getConnection(String nomFichierProp, String utilisateur, String mdp) throws IOException, ClassNotFoundException, SQLException {
         Properties props = new Properties();
         URL urlFichierProp = ConfigConnexion.class.getResource(nomFichierProp);
-        BufferedInputStream bis = null;
-        try {
-            bis = new BufferedInputStream(urlFichierProp.openStream());
+        try (BufferedInputStream bis = new BufferedInputStream(urlFichierProp.openStream())) {
             props.load(bis);
             String driver = props.getProperty("driver");
             String url = props.getProperty("url");
             Class.forName(driver);
             return DriverManager.getConnection(url, utilisateur, mdp);
-        }
-        finally {
-            if (bis != null) {
-                bis.close();
-            }
         }
     }
     
