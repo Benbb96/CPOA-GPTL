@@ -1,5 +1,5 @@
-<?php 
-	
+<?php
+
 require("../Include/functions.php");
 
 if(!isset($_SESSION['auth'])) header("Location: ../index.php");
@@ -7,9 +7,10 @@ if(!isset($_SESSION['auth'])) header("Location: ../index.php");
 $nom = strtoupper($_SESSION['auth']->nomCompte);
 $prenom = ucfirst($_SESSION['auth']->prenomCompte);
 
-$titre = "Cours";
-
+$titre = "Carte Hôtels";
 require("../Include/header.php");
-require("../Views/view_cours.php");
+require("../Views/view_carte_hotel.php");
 require("../Include/footer.php");
+
+
 ?>

@@ -23,13 +23,13 @@
     width:100%;
     background: #FFFFFF;
     margin-bottom: 30px;
-    border: 1px solid #C2501A;
+    border: 1px solid #6c0000;
 }
 
 .blocNews h1{
-    background: #C2501A;
+    background: #6c0000;
     text-transform: uppercase;
-    color: white;
+    color: #FFF;
     font-size: 0.9em;
     font-weight: normal;
     padding: 2%;
@@ -37,7 +37,7 @@
 
 .blocNews h1 span{
     float: right;
-    color: #C2501A;
+    color: #dedede;
     font-size: 0.8em;
 	text-align: right;
 }
