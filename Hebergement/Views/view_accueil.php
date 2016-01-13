@@ -49,6 +49,8 @@ while($data = $query->fetch()) {
 	echo('<br>');
 	echo('Nombre de places réservés :'.$data['nbr_lits_reserv']);
 	echo('<br>');
+	echo('Hotel :'.$data['hotel_reserv']);
+	echo('<br>');
  }
 $query->closeCursor();
 ?>
@@ -74,6 +76,8 @@ while($data = $query->fetch()) {
 	echo('Attribut :'.$data['attributArbitre']);
 	echo('<br>');
 	echo('Nombre de places réservés :'.$data['nbr_lits_reserv']);
+	echo('<br>');
+	echo('Hotel :'.$data['hotel_reserv']);
 	echo('<br>');
  }
 $query->closeCursor();

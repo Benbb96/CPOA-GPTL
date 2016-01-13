@@ -31,10 +31,10 @@ function Connect_db(){
  }
 $bdd=Connect_db();
 $query=$bdd->prepare('INSERT INTO arbitres
-					   (nomArbitre,prenomArbitre,attributArbitre,nbr_lits_reserv)
-					   VALUES(?,?,?,?)'
+					   (nomArbitre,prenomArbitre,attributArbitre,nbr_lits_reserv,hotel_reserv)
+					   VALUES(?,?,?,?,?)'
 					   );
-$query->execute(array($_POST['nom_arbitre'],$_POST['prenom_arbitre'],$_POST['attribut'],$_POST['nbr_lits']));
+$query->execute(array($_POST['nom_arbitre'],$_POST['prenom_arbitre'],$_POST['attribut'],$_POST['nbr_lits'],$_POST['hotel']));
 
 $var=$_POST['nbr_lits'];
 $var2=$_POST['hotel'];

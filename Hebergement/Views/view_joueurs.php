@@ -97,7 +97,6 @@
 		   <input type="radio" name="hotel" value="Hotel Courtyard" id="Hotel Courtyard" /> <label for="Hotel Courtyard">Hotel Courtyard&nbsp;<img src="../Web/IMG/etoile.png" width="13"><img src="../Web/IMG/etoile.png" width="13"><img src="../Web/IMG/etoile.png" width="13"><img src="../Web/IMG/etoile.png" width="13"></label><br />
 		   <input type="radio" name="hotel" value="Hotel Balladins" id="Hotel Balladins" /> <label for="Hotel Balladins">Hotel Balladins&nbsp;<img src="../Web/IMG/etoile.png" width="13"><img src="../Web/IMG/etoile.png" width="13"><img src="../Web/IMG/etoile.png" width="13"></label><br />
 		   <br>
-
 		   <label for="nbr_lits">Nombre de lits à réserver</label><br />
 		   <select name="nbr_lits" id="nbr_lits">
 			   <option value="1">1</option>
@@ -110,6 +109,7 @@
 		</form>
 	</fieldset>
 </div>
+
 <div id="hotel3">
 	<fieldset style="text-align:center;width:260px">
 	<legend style="font-size:21px; font-family:'J.M.Nexus-Black'; font-weight:bold;">Domaine de Verchant</legend>
