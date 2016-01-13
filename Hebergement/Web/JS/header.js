@@ -3,7 +3,7 @@ $(document).ready(function(){
     var url = $(location).attr('pathname');
     
     $("header nav ul li").each(function(){
-        if(("/InforMATHique/Controller/"+$(this).attr("link"))==url){
+        if(("/CPOA-GPTL/Controller/"+$(this).attr("link"))==url){
             $(this).addClass("active");
         }
     });

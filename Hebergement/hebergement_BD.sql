@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  127.0.0.1
--- Généré le :  Mer 06 Janvier 2016 à 10:32
+-- Généré le :  Mer 13 Janvier 2016 à 15:03
 -- Version du serveur :  5.6.17
 -- Version de PHP :  5.5.12
 
@@ -19,6 +19,30 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `hebergement`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `arbitres`
+--
+
+CREATE TABLE IF NOT EXISTS `arbitres` (
+  `idArbitre` int(11) NOT NULL AUTO_INCREMENT,
+  `nomArbitre` varchar(30) NOT NULL,
+  `prenomArbitre` varchar(30) NOT NULL,
+  `attributArbitre` varchar(40) NOT NULL,
+  `nbr_lits_reserv` int(11) NOT NULL,
+  PRIMARY KEY (`idArbitre`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
+
+--
+-- Contenu de la table `arbitres`
+--
+
+INSERT INTO `arbitres` (`idArbitre`, `nomArbitre`, `prenomArbitre`, `attributArbitre`, `nbr_lits_reserv`) VALUES
+(15, 'Belec', 'Hervé', 'Arbitre de Chaise', 1),
+(18, 'Mc Kayne', 'John', 'Arbitre de Ligne', 1),
+(20, 'Leuseur', 'Abdul Augustin', 'Arbitre de Filet', 1);
 
 -- --------------------------------------------------------
 
@@ -75,8 +99,8 @@ CREATE TABLE IF NOT EXISTS `hotel_arbitres` (
 --
 
 INSERT INTO `hotel_arbitres` (`id_Ahotel`, `nom`, `type`, `nbr_étoiles`, `adresse`, `code_postal`, `ville`, `nbr_lits_dispo`, `bar`, `restaurant`, `petit_déjeuner`, `sauna`, `salle_de_sport`, `coiffeur`, `pressing`, `hammam`) VALUES
-(1, 'Clos de l''herminier', 'Chambre d''''hote', 2, '25 avenue du Moulin de Tourtourel', 34880, 'Lavérune', 7, 'OUI', 'OUI', 'NON', 'NON', 'NON', 'NON', 'NON', 'NON'),
-(2, 'Hôtel Le Jardin Des Sens', 'hotel', 4, '11 Avenue Saint-Lazare', 34000, 'Montpelllier', 86, 'NON', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'NON'),
+(1, 'Clos de l''herminier', 'Chambre d''''hote', 2, '25 avenue du Moulin de Tourtourel', 34880, 'Lavérune', 31, 'OUI', 'OUI', 'NON', 'NON', 'NON', 'NON', 'NON', 'NON'),
+(2, 'Hôtel Le Jardin Des Sens', 'hotel', 4, '11 Avenue Saint-Lazare', 34000, 'Montpelllier', 67, 'NON', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'NON'),
 (3, '5 Hotel des Arceaux', 'Appart-Hotel', 3, '25 Boulevard des Arceaux', 34000, 'Montpellier', 100, 'OUI', 'OUI', 'OUI', 'OUI', 'NON', 'OUI', 'OUI', 'OUI');
 
 -- --------------------------------------------------------
@@ -110,11 +134,34 @@ CREATE TABLE IF NOT EXISTS `hotel_joueurs` (
 --
 
 INSERT INTO `hotel_joueurs` (`id_Jhotel`, `nom`, `type`, `nbr_étoiles`, `adresse`, `code_postal`, `ville`, `nbr_lits_dispo`, `bar`, `restaurant`, `petit_déjeuner`, `sauna`, `salle_de_sport`, `coiffeur`, `pressing`, `hammam`) VALUES
-(1, 'La Charmance', 'Chambre d''hote', 2, '5 Rue du Lapin', 34970, 'Lattes', 10, 'NON', 'NON', 'OUI', 'OUI', 'NON', 'NON', 'NON', 'NON'),
-(2, 'Ibis', 'Hotel', 3, '95 Place Vauban Boulevard ', 34000, 'Montpellier', 86, 'OUI', 'NON', 'OUI', 'NON', 'OUI', 'NON', 'OUI', 'NON'),
-(3, 'Domaine De Verchant', 'Hotel', 5, '1 Bd Philippe Lamour', 34170, 'Castelnau-le-Lez', 150, 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI'),
-(4, 'Hotel Courtyard', 'Hotel', 4, '105 Place Georges Freche (Rue du Chelia)', 34000, 'Montpellier', 80, 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'NON', 'NON'),
-(5, 'Hotel Balladins', 'Hotel', 3, 'Route de Carnon, Parc des Expos', 34470, 'Perols', 64, 'NON', 'OUI', 'OUI', 'NON', 'NON', 'OUI', 'OUI', 'OUI');
+(1, 'La Charmance', 'Chambre d''hote', 2, '5 Rue du Lapin', 34970, 'Lattes', 66, 'NON', 'NON', 'OUI', 'OUI', 'NON', 'NON', 'NON', 'NON'),
+(2, 'Ibis', 'Hotel', 3, '95 Place Vauban Boulevard ', 34000, 'Montpellier', 77, 'OUI', 'NON', 'OUI', 'NON', 'OUI', 'NON', 'OUI', 'NON'),
+(3, 'Domaine De Verchant', 'Hotel', 5, '1 Bd Philippe Lamour', 34170, 'Castelnau-le-Lez', 142, 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI'),
+(4, 'Hotel Courtyard', 'Hotel', 4, '105 Place Georges Freche (Rue du Chelia)', 34000, 'Montpellier', 62, 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'OUI', 'NON', 'NON'),
+(5, 'Hotel Balladins', 'Hotel', 3, 'Route de Carnon, Parc des Expos', 34470, 'Perols', 56, 'NON', 'OUI', 'OUI', 'NON', 'NON', 'OUI', 'OUI', 'OUI');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `joueurs`
+--
+
+CREATE TABLE IF NOT EXISTS `joueurs` (
+  `idJoueur` int(11) NOT NULL AUTO_INCREMENT,
+  `nomJoueur` varchar(30) NOT NULL,
+  `prenomJoueur` varchar(30) NOT NULL,
+  `classementJoueur` int(11) NOT NULL,
+  `nbr_lits_reserv` int(11) NOT NULL,
+  PRIMARY KEY (`idJoueur`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;
+
+--
+-- Contenu de la table `joueurs`
+--
+
+INSERT INTO `joueurs` (`idJoueur`, `nomJoueur`, `prenomJoueur`, `classementJoueur`, `nbr_lits_reserv`) VALUES
+(20, 'Nadal', 'Raphael', 5, 3),
+(21, 'novak', 'Djokovic', 1, 3);
 
 -- --------------------------------------------------------
 

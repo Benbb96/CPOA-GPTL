@@ -79,9 +79,9 @@
 			<label for = "prenom_arbitre"> Prénom de l'Arbitre </label><input type= "text" name = "prenom_arbitre"/><br>
 			<br>
 			<select name="attribut" id="attribut" value="attribut">
-			   <option value="ligne">Arbitre de Ligne</option>
-			   <option value="chaise">Arbitre de Chaise</option>
-			   <option value="filet">Arbitre de Filet</option>
+			   <option value="Arbitre de Ligne">Arbitre de Ligne</option>
+			   <option value="Arbitre de Chaise">Arbitre de Chaise</option>
+			   <option value="Arbitre de Filet">Arbitre de Filet</option>
 		   </select>
 	</fieldset>
 	

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../Web/CSS/Fichier-css.css" type="text/css" />
 <section id="container">
 <?php
 
@@ -42,7 +43,16 @@ $var2=$_POST['hotel'];
 $reponse = $bdd->query("Update hotel_arbitres set nbr_lits_dispo = nbr_lits_dispo -\"$var\" where nom=\"$var2\"");
 $reponse = $bdd->query("Update arbitres set nbr_lits_reserv =\"$var\"");
 
-echo('Réservation effectuée');
 ?>
+
+<div id="reserv">
+	<br>
+	<h1> Reservation Effectuée </h1>
+	<br>
+</div>
+<div id="bouton"> 
+	<a href="accueil.php"> <div href="reservation_arbitres.php" class="button">Retour à l'acceuil </div>
+</div>
+</section>
 </section>
 

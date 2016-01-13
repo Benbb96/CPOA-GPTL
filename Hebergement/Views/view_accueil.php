@@ -11,6 +11,7 @@
 <div id="bouton">
 	<a href="reservation_joueurs.php"> <div class="button">Réserver un logement pour Joueurs</div>
 </div> 
+ <br>
 
 
 <div id="joueurs">
