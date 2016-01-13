@@ -30,16 +30,16 @@ public class MatchDouble extends Match {
     private Joueur b1; // Equipe B - Joueur 1
     private Joueur b2; // Equipe B - Joueur 2
 
-    public MatchDouble(String date, int heure, String tour, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
-        super(date, heure, tour);
+    public MatchDouble(String date, int heure, String tour, Court court, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
+        super(date, heure, tour, court);
         this.a1 = a1;
         this.a2 = a2;
         this.b1 = b1;
         this.b2 = b2;
     }
     
-    public MatchDouble(int idMatchDouble, String date, int heure, String tour, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
-        super(idMatchDouble, date, heure, tour);
+    public MatchDouble(int idMatchDouble, String date, int heure, String tour, Court court, Joueur a1, Joueur a2, Joueur b1, Joueur b2) {
+        super(idMatchDouble, date, heure, tour, court);
         this.a1 = a1;
         this.a2 = a2;
         this.b1 = b1;
@@ -61,7 +61,7 @@ public class MatchDouble extends Match {
     }
     
     public String affiche() {
-        return "Match Double n°"+getIdMatch()+" - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\n\n"+a1.prenomNom()+" et "+a2.prenomNom()+"\n      Contre\n"+b1.prenomNom()+" et "+b2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
+        return "Match Double n°"+getIdMatch()+" - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\nSur le "+getCourt()+".\n\n"+a1.prenomNom()+" et "+a2.prenomNom()+"\n      Contre\n"+b1.prenomNom()+" et "+b2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
     }
     
     /**
@@ -71,7 +71,7 @@ public class MatchDouble extends Match {
      */
     public void ajouterMatchDouble(Connection conn) throws SQLIntegrityConstraintViolationException {
         try {
-            String requete = "Insert into Match_Double(idMatch, idja1, idja2, idjb1, idjb2, date_match, heure_match, tour_match) Values (?,?,?,?,?,?,?,?)";
+            String requete = "Insert into Match_Double(idMatch, idja1, idja2, idjb1, idjb2, date_match, heure_match, tour_match, idCourt) Values (?,?,?,?,?,?,?,?,?)";
             PreparedStatement prepared = conn.prepareStatement(requete);
             prepared.setInt(1,this.getIdMatch());
             prepared.setInt(2,this.getA1().getIdJoueur());
@@ -81,6 +81,7 @@ public class MatchDouble extends Match {
             prepared.setString(6,this.getDate());
             prepared.setInt(7,this.getHeure());
             prepared.setString(8, this.getTour());
+            prepared.setInt(9,this.getCourt().getIdCourt());
             int result = prepared.executeUpdate();
             System.out.println(result + " ligne(s) insérée(s)");
         } catch (SQLIntegrityConstraintViolationException ex) {
@@ -100,13 +101,14 @@ public class MatchDouble extends Match {
         System.out.println("Remise à jour de la liste des matchs en double.");
         listeMatchDouble.clear();
         try {
-            ResultSet rset = ConfigConnexion.executeRequete(conn, "select idmatch, date_match, heure_match, tour_match, idja1, idja2, idjb1, idjb2 from MATCH_DOUBLE order by heure_match");
+            ResultSet rset = ConfigConnexion.executeRequete(conn, "select idmatch, date_match, heure_match, tour_match, idja1, idja2, idjb1, idjb2, idcourt from MATCH_DOUBLE order by heure_match");
             while (rset.next()) {
                 Joueur j1 = Joueur.listeJoueurs.get(rset.getInt(5));
                 Joueur j2 = Joueur.listeJoueurs.get(rset.getInt(6));
                 Joueur j3 = Joueur.listeJoueurs.get(rset.getInt(7));
                 Joueur j4 = Joueur.listeJoueurs.get(rset.getInt(8));
-                listeMatchDouble.put(rset.getInt(1), new MatchDouble(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4),j1,j2,j3,j4));
+                Court c = Court.listeCourts.get(rset.getInt(9));
+                listeMatchDouble.put(rset.getInt(1), new MatchDouble(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4),c,j1,j2,j3,j4));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);

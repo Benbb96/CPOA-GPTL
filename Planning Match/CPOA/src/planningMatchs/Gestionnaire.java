@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import metiers.Court;
 import metiers.MatchDouble;
 
 /**
@@ -47,50 +48,38 @@ public class Gestionnaire extends JFrame {
     
     private final Connection CONNEXION;
     
-    private final JPanel application = new JPanel(new GridLayout(1,2));
-    private final JPanel planning = new JPanel(new BorderLayout());
-    private final JTabbedPane tabGestion = new JTabbedPane();
+    private final JPanel application = new JPanel(new GridLayout(1,2)); //L'application est découpé en deux parties
+    private final JPanel planning = new JPanel(new BorderLayout()); //Une partie où sera stocké le planning des matchs
+    private final JTabbedPane tabGestion = new JTabbedPane(); //Et l'autre avec des onglets de gestion
     
     private final JPanel listeJoueur = new JPanel();
-    
-    private final JourPlanning dimanche;
-    private final JourPlanning lundi;
-    private final JourPlanning mardi;
-    private final JourPlanning mercredi;
-    private final JourPlanning jeudi;
-    private final JourPlanning vendredi;
-    private final JourPlanning samedi;
+    private final JPanel listeCourt = new JPanel();
     
     private final ArrayList<JourPlanning> jours = new ArrayList();
     private final ArrayList<JJoueur> joueurs = new ArrayList();
-    ArrayList<JComboBox> comboJ;
+    private ArrayList<JComboBox> comboJ;
     
     final static String AJOUTERMATCH = "Ajouter un Match";
     final static String AJOUTERJOUEUR = "Ajouter un Joueur";
-    final static String LISTEJOUEUR = "Liste Joueur";
+    final static String LISTEJOUEUR = "Liste des joueurs";
+    final static String LISTECOURT = "Liste des courts";
     
     public Gestionnaire(Connection connexion) {
         super();
         this.CONNEXION = connexion;
         //Mise à jour de la liste des joueurs
         Joueur.updateListJoueurs(CONNEXION);
+        Court.updateListeCourts(CONNEXION);
         
-        dimanche = new JourPlanning(this,"31/01/16",CONNEXION);
-        lundi = new JourPlanning(this,"01/02/16",CONNEXION);
-        mardi = new JourPlanning(this,"02/02/16",CONNEXION);
-        mercredi = new JourPlanning(this,"03/02/16",CONNEXION);
-        jeudi = new JourPlanning(this,"04/02/16",CONNEXION);
-        vendredi = new JourPlanning(this,"05/02/16",CONNEXION);
-        samedi = new JourPlanning(this,"06/02/16",CONNEXION);
+        //On a joute tous les jours de la semaine dans l'arraylist les contenant
+        jours.add(new JourPlanning(this,"31/01/16",CONNEXION));
+        jours.add(new JourPlanning(this,"01/02/16",CONNEXION));
+        jours.add(new JourPlanning(this,"02/02/16",CONNEXION));
+        jours.add(new JourPlanning(this,"03/02/16",CONNEXION));
+        jours.add(new JourPlanning(this,"04/02/16",CONNEXION));
+        jours.add(new JourPlanning(this,"05/02/16",CONNEXION));
+        jours.add(new JourPlanning(this,"06/02/16",CONNEXION));
         
-        //Regroupement de tous les JourPlanning dans l'array list
-        jours.add(dimanche);
-        jours.add(lundi);
-        jours.add(mardi);
-        jours.add(mercredi);
-        jours.add(jeudi);
-        jours.add(vendredi);
-        jours.add(samedi);
         
         //Construction de tous panels de l'application
         build();
@@ -98,7 +87,7 @@ public class Gestionnaire extends JFrame {
     
     private void build() {
         this.setTitle("Gestionnaire Match");
-        this.setSize(900, 550);
+        this.setSize(1000, 550);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -131,8 +120,13 @@ public class Gestionnaire extends JFrame {
         for (JourPlanning j : jours) {
             JPanel pan = new JPanel();
             pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
-            pan.add(nomsJour.get(i));
+            JPanel nomJour = new JPanel();
+            nomJour.add(Box.createHorizontalGlue());
+            nomJour.add(nomsJour.get(i));
+            nomJour.add(Box.createHorizontalGlue());
+            pan.add(nomJour);
             pan.add(j);
+            pan.setBorder(BorderFactory.createRaisedBevelBorder());
             matchs.add(pan);
             i++;
         }
@@ -154,11 +148,15 @@ public class Gestionnaire extends JFrame {
         deleteAll.addActionListener((ActionEvent ae) -> {
             int option = JOptionPane.showConfirmDialog(planning, "Êtes-vous sûr de vouloir supprimer tous les matchs ?", "Suppression des matchs", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (option == JOptionPane.OK_OPTION) {
-                String requete = "Delete From Match_Simple";
-                ConfigConnexion.executeRequete(CONNEXION, requete);
-                requete = "Delete From Match_Double";
-                ConfigConnexion.executeRequete(CONNEXION, requete);
-                updateApp();
+                try {
+                    String requete = "Delete From Match_Simple";
+                    ConfigConnexion.executeRequete(CONNEXION, requete);
+                    requete = "Delete From Match_Double";
+                    ConfigConnexion.executeRequete(CONNEXION, requete);
+                    updateApp();
+                } catch (SQLIntegrityConstraintViolationException ex) {
+                    Logger.getLogger(Gestionnaire.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         enTete.add(deleteAll);
@@ -171,7 +169,7 @@ public class Gestionnaire extends JFrame {
         enTete.add(update);
         planning.add(enTete, BorderLayout.NORTH);
         planning.add(scroll, BorderLayout.CENTER);
-        planning.setSize(new Dimension(600,500));
+        planning.setSize(new Dimension(600,550));
     }
     
     public void tabGestion() {
@@ -227,8 +225,7 @@ public class Gestionnaire extends JFrame {
         simple.add(j1Pane);
         
         JPanel versus = new JPanel();
-        versus.setLayout(new BoxLayout(versus, BoxLayout.LINE_AXIS));
-        versus.add(Box.createHorizontalStrut(175));
+        versus.add(Box.createHorizontalGlue());
         versus.add(new JLabel("Versus"));
         versus.add(Box.createHorizontalGlue());
         simple.add(versus);
@@ -261,10 +258,8 @@ public class Gestionnaire extends JFrame {
         doubl.add(a1Pane);
         
         JPanel avec1 = new JPanel();
-        avec1.setLayout(new BoxLayout(avec1, BoxLayout.LINE_AXIS));
-        avec1.add(Box.createHorizontalStrut(100));
         avec1.add(new JLabel("Avec"));
-        avec1.add(Box.createHorizontalGlue());
+        avec1.add(Box.createHorizontalStrut(140));
         doubl.add(avec1);
         
         //Sélection A2
@@ -280,8 +275,7 @@ public class Gestionnaire extends JFrame {
         
         doubl.add(Box.createVerticalGlue());
         JPanel versus2 = new JPanel();
-        versus2.setLayout(new BoxLayout(versus2, BoxLayout.LINE_AXIS));
-        versus2.add(Box.createHorizontalStrut(175));
+        versus2.add(Box.createHorizontalGlue());
         versus2.add(new JLabel("Versus"));
         versus2.add(Box.createHorizontalGlue());
         doubl.add(versus2);
@@ -299,10 +293,8 @@ public class Gestionnaire extends JFrame {
         doubl.add(b1Pane);
         
         JPanel avec2 = new JPanel();
-        avec2.setLayout(new BoxLayout(avec2, BoxLayout.LINE_AXIS));
-        avec2.add(Box.createHorizontalGlue());
+        avec2.add(Box.createHorizontalStrut(250));
         avec2.add(new JLabel("Avec"));
-        avec2.add(Box.createHorizontalStrut(100));
         doubl.add(avec2);
         
         //Sélection B2
@@ -337,13 +329,7 @@ public class Gestionnaire extends JFrame {
         tour.add(Box.createHorizontalStrut(50));
         tour.add(new JLabel("Tour"));
         tour.add(Box.createHorizontalStrut(20));
-        JComboBox choixTour = new JComboBox();
-        choixTour.addItem("Qualification");
-        choixTour.addItem("1/16");
-        choixTour.addItem("1/8");
-        choixTour.addItem("Quart de finale");
-        choixTour.addItem("Demi-finale");
-        choixTour.addItem("Finale");
+        JComboTour choixTour = new JComboTour();
         choixTour.setMaximumSize(new Dimension(200,25));
         tour.add(choixTour);
         tour.add(Box.createHorizontalGlue());
@@ -356,14 +342,7 @@ public class Gestionnaire extends JFrame {
         date.add(Box.createHorizontalStrut(50));
         date.add(new JLabel("Date"));
         date.add(Box.createHorizontalStrut(20));
-        JComboBox jour = new JComboBox();
-        jour.addItem("31/01/16");
-        jour.addItem("01/02/16");
-        jour.addItem("02/02/16");
-        jour.addItem("03/02/16");
-        jour.addItem("04/02/16");
-        jour.addItem("05/02/16");
-        jour.addItem("06/02/16");
+        JComboDate jour = new JComboDate();
         jour.setMaximumSize(new Dimension(200,25));
         date.add(jour);
         date.add(Box.createHorizontalGlue());
@@ -409,7 +388,7 @@ public class Gestionnaire extends JFrame {
                         if (joueur1.equals(joueur2)) {
                             throw new DoublonJoueurException("Erreur");
                         }
-                        MatchSimple m = new MatchSimple(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
+                        MatchSimple m = new MatchSimple(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),Court.listeCourts.get(1),
                                 joueur1,
                                 joueur2);
                         m.ajouterMatchSimple(CONNEXION);
@@ -443,7 +422,7 @@ public class Gestionnaire extends JFrame {
                             throw new DoublonJoueurException(joueur2.prenomNom()+" ne peut pas jouer dans deux équipes à la fois !");
                         }
                         
-                        MatchDouble m = new MatchDouble(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),
+                        MatchDouble m = new MatchDouble(jour.getSelectedItem().toString(),getHeure(),choixTour.getSelectedItem().toString(),Court.listeCourts.get(2),
                             joueur1,
                             joueur2,
                             joueur3,
@@ -522,10 +501,18 @@ public class Gestionnaire extends JFrame {
         JScrollPane scroll = new JScrollPane(listeJoueur);
         updatePanelJoueur();
         
+        // ------------------------------------------ Onglet Liste Court ---------------------------------------
+        listeCourt.setLayout(new BoxLayout(listeCourt,BoxLayout.PAGE_AXIS));
+        Court.listeCourts.values().stream().forEach((c) -> {
+            listeCourt.add(new JLabel(c.toString()));
+        });
+        
+        
         //Ajout des onglets au Panel tabGestion
         tabGestion.addTab(AJOUTERMATCH, ajoutMatch);
         tabGestion.addTab(AJOUTERJOUEUR, ajoutJoueur);
         tabGestion.addTab(LISTEJOUEUR, scroll);
+        tabGestion.addTab(LISTECOURT, listeCourt);
     }
     
     /**
@@ -567,18 +554,27 @@ public class Gestionnaire extends JFrame {
         MatchSimple m;
         while (i<Joueur.listeJoueurs.size()) {
             if (i <= 10) {
-                m = new MatchSimple("31/01/16",(i/2)%5,"Qualification",Joueur.listeJoueurs.get(i+1),Joueur.listeJoueurs.get(i+2));
-            } else {
-                m = new MatchSimple("01/02/16",(i/2)%5,"Qualification",Joueur.listeJoueurs.get(i+1),Joueur.listeJoueurs.get(i+2));
-            }
+                m = new MatchSimple("31/01/16",(i/2)%5,"Qualification",Court.listeCourts.get(1),Joueur.listeJoueurs.get(i+1),Joueur.listeJoueurs.get(i+2));
                 try {
-                m.ajouterMatchSimple(CONNEXION);
-            } catch (SQLIntegrityConstraintViolationException ex) {
-                JOptionPane.showMessageDialog(planning,
-                m+"\n\nCe match existe déjà.",
-                "Erreur de contrainte d'intégrité",
-                JOptionPane.ERROR_MESSAGE);
-            }
+                    m.ajouterMatchSimple(CONNEXION);
+                } catch (SQLIntegrityConstraintViolationException ex) {
+                    JOptionPane.showMessageDialog(planning,
+                    m+"\n\nCe match existe déjà.",
+                    "Erreur de contrainte d'intégrité",
+                    JOptionPane.ERROR_MESSAGE);
+                }
+            } /*else if (i <= 20) {
+                m = new MatchSimple("01/02/16",(i/2)%5,"Qualification",Court.listeCourts.get(1),Joueur.listeJoueurs.get(i+1),Joueur.listeJoueurs.get(i+2));
+                try {
+                    m.ajouterMatchSimple(CONNEXION);
+                } catch (SQLIntegrityConstraintViolationException ex) {
+                    JOptionPane.showMessageDialog(planning,
+                    m+"\n\nCe match existe déjà.",
+                    "Erreur de contrainte d'intégrité",
+                    JOptionPane.ERROR_MESSAGE);
+                }
+            }*/
+            
             i+=2;
         }
         updateApp();

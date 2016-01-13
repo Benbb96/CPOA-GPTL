@@ -8,7 +8,6 @@ package planningMatchs;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.sql.Connection;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import metiers.MatchDouble;

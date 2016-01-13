@@ -17,6 +17,8 @@ public abstract class Personne {
     
     private static final String[] LISTENAT = new String[100];
     
+    public Personne() {}
+    
     public Personne(String nom, String prenom, String nationalite) {
         this.nom = nom;
         this.prenom = prenom;

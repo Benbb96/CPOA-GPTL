@@ -90,14 +90,18 @@ public class ConfigConnexion {
      * @param conn Une connexion à la base
      * @param requete String contenant la requête SQL
      * @return un ResultSet contenant le résultat de la requête
+     * @throws java.sql.SQLIntegrityConstraintViolationException
      */
-    public static ResultSet executeRequete(Connection conn, String requete) {
+    public static ResultSet executeRequete(Connection conn, String requete) throws SQLIntegrityConstraintViolationException {
         ResultSet rset = null;
         try {
             Class.forName ("oracle.jdbc.OracleDriver");
             Statement stmt = conn.createStatement();
             System.out.println("Reqête SQl envoyée : "+requete);
             rset = stmt.executeQuery (requete);
+        }
+        catch (SQLIntegrityConstraintViolationException e) {
+            throw new SQLIntegrityConstraintViolationException();
         }
         catch (ClassNotFoundException e) {
             System.err.println("La classe n'a pas été trouvée :"+e.getMessage());

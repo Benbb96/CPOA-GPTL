@@ -25,19 +25,22 @@ public abstract class Match {
     private String date;
     private int heure; //0 = 8h ; 1 = 11h ; 2 = 15h ; 3 = 18h ; 4 = 21h
     private String tour; //Qualif, 1/4, 1/2 ou finale ?
+    private Court court; //Le court associé au match
     
-    public Match (String date, int heure, String tour) {
+    public Match (String date, int heure, String tour, Court court) {
         idMatch = ++lastId;
         this.date = date;
         this.heure = heure;
         this.tour = tour;
+        this.court = court;
     }
     
-    public Match(int idMatch, String date, int heure, String tour) {
+    public Match(int idMatch, String date, int heure, String tour, Court court) {
         this.idMatch = idMatch;
         this.date = date;
         this.heure = heure;
         this.tour = tour;
+        this.court = court;
     }
     
     public static int getLastId(boolean update) {System.out.println("Obtenir le dernier id des matchs :");
@@ -76,13 +79,26 @@ public abstract class Match {
         }
     }
     
+    public static String getRealTime(int heure) {
+        switch (heure) {
+            case 0 : return "8h";
+            case 1 : return "11h";
+            case 2 : return "15h";
+            case 3 : return "18h";
+            case 4 : return "21h";
+            default : return "Erreur Horaire !";
+        }
+    }
+    
     public int getIdMatch() {return idMatch;}
     public String getDate() {return date;}
     public int getHeure() {return heure;}
     public String getTour() {return tour;}
+    public Court getCourt() {return court;}
     public void setIdMatch(int idMatch) {this.idMatch = idMatch;}
     public void setDate(String date) {this.date = date;}
     public void setHeure(int heure) {this.heure = heure;}
     public void setTour(String tour) {this.tour = tour;}
+    public void setCourt(Court court) {this.court = court;}
     
 }

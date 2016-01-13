@@ -29,14 +29,14 @@ public class MatchSimple extends Match {
     private Joueur j2;
     private int vainqueur; // =1 si le j1 a gagné, 2 si c'est j2
 
-    public MatchSimple(String date, int heure, String tour, Joueur j1, Joueur j2) {
-        super(date, heure, tour);
+    public MatchSimple(String date, int heure, String tour, Court court, Joueur j1, Joueur j2) {
+        super(date, heure, tour, court);
         this.j1 = j1;
         this.j2 = j2;
     }
     
-    public MatchSimple(int idMatchSimple, String date, int heure, String tour, Joueur j1, Joueur j2) {
-        super(idMatchSimple, date, heure, tour);
+    public MatchSimple(int idMatchSimple, String date, int heure, String tour, Court court, Joueur j1, Joueur j2) {
+        super(idMatchSimple, date, heure, tour, court);
         this.j1 = j1;
         this.j2 = j2;
     }
@@ -54,12 +54,12 @@ public class MatchSimple extends Match {
     }
     
     public String affiche() {
-        return "Match Simple - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\n\n"+j1.prenomNom()+" Contre "+j2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
+        return "Match Simple - "+getTour()+" ("+getDate()+" à "+getRealTime()+")\nSur le "+getCourt()+".\n\n"+j1.prenomNom()+" Contre "+j2.prenomNom()+"\n\nVoulez-vous modifier ce match ?";
     }
     
     public void ajouterMatchSimple(Connection conn) throws SQLIntegrityConstraintViolationException {
         try {
-            String requete = "Insert into Match_Simple(idMatch, idj1, idj2, date_match, heure_match, tour_match) Values (?,?,?,?,?,?)";
+            String requete = "Insert into Match_Simple(idMatch, idj1, idj2, date_match, heure_match, tour_match, idcourt) Values (?,?,?,?,?,?,?)";
             PreparedStatement prepared = conn.prepareStatement(requete);
             prepared.setInt(1,this.getIdMatch());
             prepared.setInt(2,this.getJ1().getIdJoueur());
@@ -67,6 +67,7 @@ public class MatchSimple extends Match {
             prepared.setString(4,this.getDate());
             prepared.setInt(5,this.getHeure());
             prepared.setString(6,this.getTour());
+            prepared.setInt(7,this.getCourt().getIdCourt());
             int result = prepared.executeUpdate();
             System.out.println(result + " ligne(s) insérée(s)");
         } catch (SQLIntegrityConstraintViolationException ex) {
@@ -86,11 +87,12 @@ public class MatchSimple extends Match {
         System.out.println("Remise à jour de la liste des matchs en simple.");
         listeMatchSimple.clear();
         try {
-            ResultSet rset = ConfigConnexion.executeRequete(conn,"select idmatch, date_match, heure_match, tour_match, idj1, idj2 from MATCH_SIMPLE ");
+            ResultSet rset = ConfigConnexion.executeRequete(conn,"select idmatch, date_match, heure_match, tour_match, idj1, idj2, idCourt from MATCH_SIMPLE ");
             while (rset.next()) {
                 Joueur j1 = Joueur.listeJoueurs.get(rset.getInt(5));
                 Joueur j2 = Joueur.listeJoueurs.get(rset.getInt(6));
-                listeMatchSimple.put(rset.getInt(1), new MatchSimple(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4),j1,j2));
+                Court c = Court.listeCourts.get(rset.getInt(7));
+                listeMatchSimple.put(rset.getInt(1), new MatchSimple(rset.getInt(1),rset.getString(2),rset.getInt(3),rset.getString(4),c,j1,j2));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);

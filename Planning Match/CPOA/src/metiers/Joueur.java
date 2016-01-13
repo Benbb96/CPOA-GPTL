@@ -35,9 +35,11 @@ public class Joueur extends Personne {
      * @param nom Le nom du Joueur
      * @param prenom Le prénom du joueur
      * @param nationalite La nationalité du joueur
+     * @param classement Le classeemnt du joueur
      */
-    public Joueur(int idJoueur, String nom, String prenom, String nationalite) {
+    public Joueur(int idJoueur, String nom, String prenom, String nationalite, int classement) {
         super(nom, prenom, nationalite);
+        this.classement = classement;
         this.idJoueur = idJoueur;
         lastId = idJoueur;
     }
@@ -53,6 +55,8 @@ public class Joueur extends Personne {
         this.idJoueur = ++lastId;
         lastId = idJoueur;
     }
+
+    public Joueur() {}
     
     public int getIdJoueur() {return idJoueur;}
     public int getClassement() {return classement;}
@@ -80,9 +84,9 @@ public class Joueur extends Personne {
     public static void updateListJoueurs(Connection connexion) {
         System.out.println("Remise à jour de la liste des Joueurs");
         try {
-            ResultSet rset = ConfigConnexion.executeRequete(connexion,"select idjoueur, nom, prenom, nationalite from JOUEUR order by idjoueur");
+            ResultSet rset = ConfigConnexion.executeRequete(connexion,"select idjoueur, nom, prenom, nationalite, classement from JOUEUR order by idjoueur");
             while (rset.next()) {
-                listeJoueurs.put(rset.getInt(1), new Joueur(rset.getInt(1),rset.getString(2),rset.getString(3),rset.getString(4)));
+                listeJoueurs.put(rset.getInt(1), new Joueur(rset.getInt(1),rset.getString(2),rset.getString(3),rset.getString(4), rset.getInt(5)));
             }
         } catch (SQLException ex) {
             Logger.getLogger(Joueur.class.getName()).log(Level.SEVERE, null, ex);
@@ -113,5 +117,16 @@ public class Joueur extends Personne {
         } catch (SQLException ex) {
             Logger.getLogger(MatchSimple.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static boolean contains(String prenom, String nom) {
+        return listeJoueurs.values().stream().anyMatch((j) -> (j.getPrenom().equals(prenom) && j.getNom().equals(nom)));
+    }
+    
+    public static Joueur getJoueur(String p, String n) {
+        for (Joueur j : listeJoueurs.values()) {
+            if (j.getPrenom().equals(p) && j.getNom().equals(n)) return j;
+        }
+        return null;
     }
 }

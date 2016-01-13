@@ -104,27 +104,14 @@ public class ModifierMatchDouble extends JDialog{
         //Choix du tour
         JPanel choixTour = new JPanel();
         choixTour.setBorder(BorderFactory.createTitledBorder("Choix du tour"));
-        tour = new JComboBox();
-        tour.addItem("Qualification");
-        tour.addItem("1/16");
-        tour.addItem("1/8");
-        tour.addItem("Quart de finale");
-        tour.addItem("Demi-finale");
-        tour.addItem("Finale");
+        tour = new JComboTour();
         tour.setSelectedItem(match.getTour());
         choixTour.add(tour);
 
         //Date et heure
         JPanel dateHeure = new JPanel();
         dateHeure.setBorder(BorderFactory.createTitledBorder("Date et Heure"));
-        date = new JComboBox();
-        date.addItem("31/01/16");
-        date.addItem("01/02/16");
-        date.addItem("02/02/16");
-        date.addItem("03/02/16");
-        date.addItem("04/02/16");
-        date.addItem("05/02/16");
-        date.addItem("06/02/16");
+        date = new JComboDate();
         date.setSelectedItem(match.getDate());
         h1 = new JRadioButton("8h");
         if (match.getHeure() == 0) h1.setSelected(true);
